@@ -46,18 +46,23 @@ parse(choice, returns("1"), returns("2")) ("abcde")
 sat(is.character) ("abc")
 sat(is.character) ("123")
 
-isChar("p") ("pdf")
-isChar("q") ("pdf")
-isDigit() ("abc")
-isDigit() ("1abc")
+Char("p") ("pdf")
+Char("q") ("pdf")
+Digit() ("abc")
+Digit() ("1abc")
 
-parse(isDigit) ("123")
-parse(isChar, "a") ("abc")
+parse(Digit) ("123")
+parse(Char, "a") ("abc")
 
+String("ab") ("abcde")
+String("ab") ("1234")
+parse(String, "ab") ("abcd")
 
+# testing many and many1
+many(Digit()) ("123abc")
+many(Digit()) ("abcde")
+many1(Digit()) ("abc")
 
-
-
-
-
-
+ident() ("abc def")
+nat() ("123a")
+space() ("    abc")

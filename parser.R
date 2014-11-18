@@ -37,6 +37,8 @@ item <- function(...){
 #' ```
 #' (parserp(...) %>=% parserf(...)) (string)
 #' ```
+#' 
+#' This is also known as the bind function
 then <- function(parserp, parserf) {
   return(function(string) {
     result <- parserp (string)
@@ -50,6 +52,10 @@ then <- function(parserp, parserf) {
   })
 }
 
+#' Usage:
+#' ```
+#' ( item() %>>=% item() %>>=% item() %>>=% failure() ) ("abcdefghi")
+#' ```
 `%>>=%` <- then
 
 #' doList :: Parser a -> Parsec b -> ... -> Parser n -> (a -> b -> ... -> n -> Parser n) -> Parser n
@@ -64,13 +70,15 @@ do <- function(do, f) {
   return(function(string){
     doResult <- list()
     result <- list(leftover = string)
-    for(element in 1:length(do)) { # has to be a better way
+    for(element in 1:length(do)) { # What is the apply approach? it will probably be invisible(apply)
       if (length(result) == 0){
         return (list()) # no more tokens
       }
       result_ <-  do[[element]] (result$leftover) # apply the current function
       if(is.null(result_$leftover)) {return(list())} # only succeeds if every parser in the sequence succeeds
-      tryCatch({doResult[[names(do[element])]] <- result_$result}) # if the token is to be assigned...
+      tryCatch({doResult[[names(do[element])]] <- result_$result},
+               error=function(x) {return(NA)},
+               warning=function(x) {return(NULL)}) # try catch to ensure that the token is assigned (if it is meant to be assigned), otherwise it is discarded
       result$leftover <- result_$leftover
     }
     
@@ -91,6 +99,10 @@ choice <- function(parserp, parserq) {
   })
 }
 
+#' Usage:
+#' ```
+#' (item() %+++% returns("2")) ("abcdef")
+#' ```
 `%+++%` <- choice
 
 #' sat :: (Char -> Bool) -> Parser Char
@@ -110,8 +122,9 @@ Digit <- function(...) sat(function(x) {return(!!length(grep("[0-9]", x)))})
 Lower <- function(...) sat(function(x) {return(!!length(grep("[a-z]", x)))})
 Upper <- function(...) sat(function(x) {return(!!length(grep("[A-Z]", x)))})
 Alpha <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z]", x)))})
-AlphaNum <- function(...) sat(function(x) {return(!length(grep("[A-Za-z0-9]", x)))})
+AlphaNum <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
 Char <- function(c) {sat(function(x) {return(c==x)})}
+Space <- function(...) sat(function(x) {return(!!length(grep("\\s", x)))})
 
 #' string :: String -> Parser String
 String <- function(x) {
@@ -123,7 +136,49 @@ String <- function(x) {
   }
 }
 
-String("a") ("asdfghjk")
+#' many :: Parser a -> Parser [a]
+#' many matches 0 or more of pattern p
+many <- function(p) {
+  many1 (p) %+++% returns(list())
+}
 
+#' many1 :: Parser a -> Parser[a]
+#' many1 matches 1 or more of pattern p
+many1 <- function(p) {
+  do(do=list(v=p,
+             vs=many(p)),
+     f = function(v,vs="") {paste0(v,vs)})
+}
 
+#' ident :: Parser String
+#' ident is identify, which is lowercase followed by zero or more alphanumeric
+ident <- function() {
+  do(do = list(x = Lower(),
+               xs = many(AlphaNum())), 
+     f = function(x,xs="") {paste0(x,xs)})
+}
 
+#' nat :: Parser Int
+nat <- function() {
+  do(do=list(xs = many1(Digit())),
+     f = function(xs) {xs})
+}
+
+#' space :: Parser ()
+space <- function() {
+  do(do=list(xs = many(Space())),
+     f = function(x) {return(list())})
+}
+
+#' token :: Parser a -> Parser a
+token <- function(p) {
+  do(do = list(space(),
+               v = p,
+               space()), 
+     f = function(v) {v})
+}
+
+#' identifier :: Parser String
+identifier <- function() {token(ident())}
+natural <- function() {token(nat())}
+symbol <- function(xs) {token(String(xs))}
