@@ -46,6 +46,18 @@ parse(choice, returns("1"), returns("2")) ("abcde")
 sat(is.character) ("abc")
 sat(is.character) ("123")
 
+isChar("p") ("pdf")
+isChar("q") ("pdf")
+isDigit() ("abc")
+isDigit() ("1abc")
+
+parse(isDigit) ("123")
+parse(isChar, "a") ("abc")
+
+
+
+
+
 
 
 

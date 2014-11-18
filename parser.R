@@ -1,4 +1,5 @@
-# parser combinator written in R
+#' parser combinator written in R
+#' requires R.utils
 
 #' parsed :: String -> String -> ParsedResult
 parsed <- function(r,l) {
@@ -69,12 +70,14 @@ do <- function(do, f) {
       }
       result_ <-  do[[element]] (result$leftover) # apply the current function
       if(is.null(result_$leftover)) {return(list())} # only succeeds if every parser in the sequence succeeds
-      if (names(do[element]) != "") { # if the token is to be assigned...
-        doResult[[names(do[element])]] <- result_$result
-      }
+      tryCatch({doResult[[names(do[element])]] <- result_$result}) # if the token is to be assigned...
       result$leftover <- result_$leftover
-    }    
-    return(list(result = do.call(f, doResult), leftover=result$leftover))
+    }
+    
+    # can fail in the final call, we need to check the function call
+    fcall <- R.utils::doCall(f, args=doResult)
+    if (is.null(fcall)) {return(list())}
+    else {return(list(result = fcall, leftover=result$leftover))}
   })
 }
 
@@ -97,13 +100,30 @@ sat <- function(p) {
       return(x)
     }
     else {
-      return(list())
+      return(c())
     }
   })
 }
 
+## define the generic functions
+Digit <- function(...) sat(function(x) {return(!!length(grep("[0-9]", x)))})
+Lower <- function(...) sat(function(x) {return(!!length(grep("[a-z]", x)))})
+Upper <- function(...) sat(function(x) {return(!!length(grep("[A-Z]", x)))})
+Alpha <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+AlphaNum <- function(...) sat(function(x) {return(!length(grep("[A-Za-z0-9]", x)))})
+Char <- function(c) {sat(function(x) {return(c==x)})}
 
+#' string :: String -> Parser String
+String <- function(x) {
+  if(x=="") {return(returns(""))}
+  else {
+    do(do=list(Char(substr(x,1,1)),
+               String(substring(x,2))),
+       f = function() {return(x)})
+  }
+}
 
+String("a") ("asdfghjk")
 
 
 
