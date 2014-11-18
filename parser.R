@@ -147,7 +147,7 @@ many <- function(p) {
 many1 <- function(p) {
   do(do=list(v=p,
              vs=many(p)),
-     f = function(v,vs="") {paste0(v,vs)})
+     f = function(v,vs="") {unlist(c(v,vs))})
 }
 
 #' ident :: Parser String
@@ -155,13 +155,13 @@ many1 <- function(p) {
 ident <- function() {
   do(do = list(x = Lower(),
                xs = many(AlphaNum())), 
-     f = function(x,xs="") {paste0(x,xs)})
+     f = function(x,xs="") {paste0(x,paste(xs, collapse=''))})
 }
 
 #' nat :: Parser Int
 nat <- function() {
   do(do=list(xs = many1(Digit())),
-     f = function(xs) {xs})
+     f = function(xs) {paste(xs, collapse='')})
 }
 
 #' space :: Parser ()

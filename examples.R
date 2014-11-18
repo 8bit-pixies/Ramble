@@ -66,3 +66,26 @@ many1(Digit()) ("abc")
 ident() ("abc def")
 nat() ("123a")
 space() ("    abc")
+
+natural() ("   123  1")
+
+# do many example
+many(do(do=list(y=symbol(","),
+                x=natural()), 
+        function(x,y){
+          unlist(c(y,x))
+        })) (", 123 ,456 ,7, 8, 9 ")
+
+
+#' below is an example on parsing a list of numbers
+#' The parser will parse things like:
+#' 
+#' [1,2,3]
+#' 
+#' but not
+#' 
+#' [1,2,]
+
+
+
+
