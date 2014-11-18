@@ -59,9 +59,7 @@ then <- function(parserp, parserf) {
 #' 
 #' For example, `do` can be like:
 #' do=list(x=item(), item(), y=item())
-do <- function(do, f, ...) {
-  #doMatchCall <- as.list(match.call())
-  doMatchCall <- list()
+do <- function(do, f) {
   return(function(string){
     doResult <- list()
     result <- list(leftover = string)
@@ -76,7 +74,7 @@ do <- function(do, f, ...) {
       }
       result$leftover <- result_$leftover
     }    
-    return(list(result = do.call(f, append(doResult, doMatchCall)), leftover=result$leftover))
+    return(list(result = do.call(f, doResult), leftover=result$leftover))
   })
 }
 
@@ -94,8 +92,8 @@ choice <- function(parserp, parserq) {
 
 #' sat :: (Char -> Bool) -> Parser Char
 sat <- function(p) {
-  do(do=list(x=item()), f = function(x,p) {
-    if(p(x)) {
+  do(do=list(x=item()), f = function(x) {
+    if(p (x)) {
       return(x)
     }
     else {

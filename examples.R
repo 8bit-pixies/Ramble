@@ -44,6 +44,7 @@ parse(choice, returns("1"), returns("2")) ("abcde")
 
 # testing sat
 sat(is.character) ("abc")
+sat(is.character) ("123")
 
 
 
