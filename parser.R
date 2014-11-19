@@ -7,7 +7,7 @@ parsed <- function(r,l) {
 }
 
 #' parse :: Parser a -> String -> [(a, String)]
-parse <- function(parser, ...) {
+parses <- function(parser, ...) {
   return(parser(...))
 }
 
@@ -81,6 +81,8 @@ do <- function(do, f) {
                warning=function(x) {return(NULL)}) # try catch to ensure that the token is assigned (if it is meant to be assigned), otherwise it is discarded
       result$leftover <- result_$leftover
     }
+    
+    doResult$leftover_ <- result$leftover
     
     # can fail in the final call, we need to check the function call
     fcall <- R.utils::doCall(f, args=doResult)
@@ -182,3 +184,6 @@ token <- function(p) {
 identifier <- function() {token(ident())}
 natural <- function() {token(nat())}
 symbol <- function(xs) {token(String(xs))}
+
+
+
