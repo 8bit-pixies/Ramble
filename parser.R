@@ -62,7 +62,10 @@ then <- function(parserp, parserf) {
 #' Accepts a list of funtions to perform parsing.
 #' 
 #' do : this is is the list of parsers
-#' f : this is the function to be applied, based on the variables in do
+#' f : this is the function to be applied, based on the variables in do.
+#'     This function can also pickup "leftovers" via the argument "leftover_" which 
+#'     has been reserved especially for `f`. sample usage: 
+#'     `do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")`
 #' 
 #' For example, `do` can be like:
 #' do=list(x=item(), item(), y=item())
@@ -87,7 +90,13 @@ do <- function(do, f) {
     # can fail in the final call, we need to check the function call
     fcall <- R.utils::doCall(f, args=doResult)
     if (is.null(fcall)) {return(list())}
-    else {return(list(result = fcall, leftover=result$leftover))}
+    else {
+      # if fcall returns a list with the element leftover, we need to take that one
+      if ("leftover" %in% names(fcall)) {
+        return(list(result = fcall$result, leftover=fcall$leftover))
+      }
+      return(list(result = fcall, leftover=result$leftover))
+    }
   })
 }
 

@@ -126,7 +126,7 @@ parses(numlist) ("[1,2,] abcde")
 #' this is important because we would need to modify it to accept other
 #' expressions as well
 expr <- do(do=list(t=natural()),
-  f=function(t, leftover_) {return(   
+  f=function(t, leftover_) {return(
     (do(do=list(
       symbol("+"),
       e=expr()
@@ -139,6 +139,15 @@ expr <- do(do=list(t=natural()),
 do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")
 natural() ("123 123")
 
+(do(do=list(t=natural()), 
+   f=function(t,leftover_) {return(t)}) %+++% returns("a")) ("a123 123")
+
+do(do=list(t=natural()),
+   f=function(t, leftover_) {
+     then_result <- natural() (leftover_)
+     return(list(result=c(unlist(t),unlist(then_result$result)),
+                 leftover=then_result$leftover))
+   }) ("1 2")
 
 #' expression example
 #' expr :: = term ( + expr | e)
