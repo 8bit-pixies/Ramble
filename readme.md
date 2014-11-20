@@ -11,7 +11,7 @@ This is inspired by **Programming in Haskell by Graham Hutton**, and also the [J
 File Structure
 ==============
 
-Currently this isn't really an R package. Everything lives in `parser.r` with sample usage in `example.r`.
+Currently this isn't really an R package. Everything lives in `parser.r` with sample usage in `example.r` and `expr.r`. `expr.r` demonstrates how you might be able to build a more complex parser using this code.
 
 Notes
 =====
