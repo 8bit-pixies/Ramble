@@ -33,7 +33,7 @@ then(item(), returns("123")) ("abc")
 ( item() %>>=% item() %>>=% item() %>>=% failure() ) ("abcdefghi")
 
 # testing do function
-do(do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("abcdef")
+do(do=list(x=item(), item(), y=item()), f = function(x,y) {unlist(x,y)}) ("abcdef")
 do(do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("ab")
 parses(do, do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("abcdef")
 
@@ -125,22 +125,11 @@ parses(numlist) ("[1,2,] abcde")
 #' unlimited times, using only do lists (not the many function)
 #' this is important because we would need to modify it to accept other
 #' expressions as well
-expr <- do(do=list(t=natural()),
-  f=function(t, leftover_) {return(
-    (do(do=list(
-      symbol("+"),
-      e=expr()
-      ),
-    f=function(t,e) {
-      as.numeric(t) + as.numeric(e)
-    }) %+++% returns(t)) (leftover_)
-  )})
-
 do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")
 natural() ("123 123")
 
 (do(do=list(t=natural()), 
-   f=function(t,leftover_) {return(t)}) %+++% returns("a")) ("a123 123")
+    f=function(t,leftover_) {return(t)}) %+++% returns("a")) ("a123 123")
 
 do(do=list(t=natural()),
    f=function(t, leftover_) {
@@ -149,9 +138,18 @@ do(do=list(t=natural()),
                  leftover=then_result$leftover))
    }) ("1 2")
 
-#' expression example
-#' expr :: = term ( + expr | e)
-#' term :: = factor ( * term | e) 
-#' factor :: = (expr) | nat
-#' nat :: = 0 | 1 | 2 | ...
+#' exprTest
+#' 
+#' exprTest = do t <- natural
+#'          do s <- symbol "+"
+#'            return (t:s)
+#'            +++ return t
+exprTest <- do(do=list(t=natural()),
+           f=function(t, leftover_) {
+             return(
+               (do(list(x=symbol("+")), function(x) { unlist(c(t,x)) }) %+++% returns(t)) (leftover_)
+               )
+           })
+
+exprTest("123 + 45")
 

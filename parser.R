@@ -88,17 +88,19 @@ do <- function(do, f) {
     doResult$leftover_ <- result$leftover
     
     # can fail in the final call, we need to check the function call
-    fcall <- R.utils::doCall(f, args=doResult)
-    if (is.null(fcall)) {return(list())}
-    else {
+    fcall <- R.utils::doCall(f, args=doResult,.ignoreUnusedArgs=TRUE)
+    if (is.null(fcall)) {
+      return(list())
+    }
+    else if ("leftover" %in% names(fcall)) {
       # if fcall returns a list with the element leftover, we need to take that one
-      if ("leftover" %in% names(fcall)) {
-        return(list(result = fcall$result, leftover=fcall$leftover))
-      }
+      return(list(result = fcall$result, leftover=fcall$leftover))
+    }
+    else {
       return(list(result = fcall, leftover=result$leftover))
     }
-  })
-}
+  }
+)}
 
 #' choice (or else)
 #' (+++) :: Parser a -> Parser a -> Parser a
