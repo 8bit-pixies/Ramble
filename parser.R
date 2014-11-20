@@ -7,7 +7,7 @@ parsed <- function(r,l) {
 }
 
 #' parse :: Parser a -> String -> [(a, String)]
-parse <- function(parser, ...) {
+parses <- function(parser, ...) {
   return(parser(...))
 }
 
@@ -62,7 +62,10 @@ then <- function(parserp, parserf) {
 #' Accepts a list of funtions to perform parsing.
 #' 
 #' do : this is is the list of parsers
-#' f : this is the function to be applied, based on the variables in do
+#' f : this is the function to be applied, based on the variables in do.
+#'     This function can also pickup "leftovers" via the argument "leftover_" which 
+#'     has been reserved especially for `f`. sample usage: 
+#'     `do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")`
 #' 
 #' For example, `do` can be like:
 #' do=list(x=item(), item(), y=item())
@@ -82,12 +85,22 @@ do <- function(do, f) {
       result$leftover <- result_$leftover
     }
     
+    doResult$leftover_ <- result$leftover
+    
     # can fail in the final call, we need to check the function call
-    fcall <- R.utils::doCall(f, args=doResult)
-    if (is.null(fcall)) {return(list())}
-    else {return(list(result = fcall, leftover=result$leftover))}
-  })
-}
+    fcall <- R.utils::doCall(f, args=doResult,.ignoreUnusedArgs=TRUE)
+    if (is.null(fcall)) {
+      return(list())
+    }
+    else if ("leftover" %in% names(fcall)) {
+      # if fcall returns a list with the element leftover, we need to take that one
+      return(list(result = fcall$result, leftover=fcall$leftover))
+    }
+    else {
+      return(list(result = fcall, leftover=result$leftover))
+    }
+  }
+)}
 
 #' choice (or else)
 #' (+++) :: Parser a -> Parser a -> Parser a
@@ -147,7 +160,7 @@ many <- function(p) {
 many1 <- function(p) {
   do(do=list(v=p,
              vs=many(p)),
-     f = function(v,vs="") {paste0(v,vs)})
+     f = function(v,vs="") {unlist(c(v,vs))})
 }
 
 #' ident :: Parser String
@@ -155,13 +168,13 @@ many1 <- function(p) {
 ident <- function() {
   do(do = list(x = Lower(),
                xs = many(AlphaNum())), 
-     f = function(x,xs="") {paste0(x,xs)})
+     f = function(x,xs="") {paste0(x,paste(xs, collapse=''))})
 }
 
 #' nat :: Parser Int
 nat <- function() {
   do(do=list(xs = many1(Digit())),
-     f = function(xs) {xs})
+     f = function(xs) {paste(xs, collapse='')})
 }
 
 #' space :: Parser ()
@@ -182,3 +195,6 @@ token <- function(p) {
 identifier <- function() {token(ident())}
 natural <- function() {token(nat())}
 symbol <- function(xs) {token(String(xs))}
+
+
+

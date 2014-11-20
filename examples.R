@@ -1,13 +1,13 @@
-parse(returns, "1") ("abc") 
+parses(returns, "1") ("abc") 
 returns("1") ("abc")
 
-parse(failure) ("abc")
+parses(failure) ("abc")
 failure() ("abc")
 
-parse(item) ("")
+parses(item) ("")
 item() ("")
 
-parse(item) ("abc")
+parses(item) ("abc")
 item() ("abc")
 
 # checking functionality of then
@@ -33,14 +33,14 @@ then(item(), returns("123")) ("abc")
 ( item() %>>=% item() %>>=% item() %>>=% failure() ) ("abcdefghi")
 
 # testing do function
-do(do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("abcdef")
+do(do=list(x=item(), item(), y=item()), f = function(x,y) {unlist(x,y)}) ("abcdef")
 do(do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("ab")
-parse(do, do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("abcdef")
+parses(do, do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("abcdef")
 
 # testing choice function
 choice(returns("1"), returns("2")) ("abcdef")
 (item() %+++% returns("2")) ("abcdef")
-parse(choice, returns("1"), returns("2")) ("abcde")
+parses(choice, returns("1"), returns("2")) ("abcde")
 
 # testing sat
 sat(is.character) ("abc")
@@ -66,3 +66,90 @@ many1(Digit()) ("abc")
 ident() ("abc def")
 nat() ("123a")
 space() ("    abc")
+
+natural() ("   123  1")
+
+# do many example
+many(do(do=list(y=symbol(","),
+                x=natural()), 
+        function(x,y){
+          unlist(c(y,x))
+        })) (", 123 ,456 ,7, 8, 9 ")
+
+#' below is an example on parsing a list of numbers
+#' The parser will parse things like:
+#' 
+#' [1,2,3]
+#' 
+#' but not
+#' 
+#' [1,2,]
+#' numlist :: Parser [Int]
+numlist <- function(...) {do(
+  do = list(
+    symbol("["),
+    n=natural(),
+    ns=many(do(do=list(y=symbol(","),
+                       x=natural()), 
+               function(x,y){
+                 unlist(c(y,x))
+                 
+                 # trying to coerce into R object
+                 # this sort of works, but tuples aren't really supported in R
+                 return(c(eval(parse(text=x))))
+               })),
+    symbol("]")
+    ),
+  f=function(n,ns){
+    #unlist(c("[", n, ns, "]"))
+    unlist(c(n, ns))
+    
+    # using eval to actually return an R object...
+    # this sort of works, but tuples aren't really supported in R
+    return(c(eval(parse(text=n)), ns))
+    
+  })}
+numlist() ("[12,34,5] abcde")
+parses(numlist) ("[1,2,3] abcde")
+numlist() ("[1,2,] abcde")
+parses(numlist) ("[1,2,] abcde")
+(numlist() %>>=% identifier()) ("[1,23,4] abcd")
+
+#' parsing with nested do lists
+#' 
+#' The parser defined below is simply to parse things in the form:
+#' 1
+#' 1+2
+#' 1+2+3+...
+#' 
+#' unlimited times, using only do lists (not the many function)
+#' this is important because we would need to modify it to accept other
+#' expressions as well
+do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")
+natural() ("123 123")
+
+(do(do=list(t=natural()), 
+    f=function(t,leftover_) {return(t)}) %+++% returns("a")) ("a123 123")
+
+do(do=list(t=natural()),
+   f=function(t, leftover_) {
+     then_result <- natural() (leftover_)
+     return(list(result=c(unlist(t),unlist(then_result$result)),
+                 leftover=then_result$leftover))
+   }) ("1 2")
+
+#' exprTest
+#' 
+#' exprTest = do t <- natural
+#'          do s <- symbol "+"
+#'            return (t:s)
+#'            +++ return t
+exprTest <- do(do=list(t=natural()),
+           f=function(t, leftover_) {
+             return(
+               (do(list(x=symbol("+")), function(x) { unlist(c(t,x)) }) %+++% returns(t)) (leftover_)
+               )
+           })
+
+exprTest("123 + 45")
+
