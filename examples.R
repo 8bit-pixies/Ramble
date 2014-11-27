@@ -33,9 +33,9 @@ then(item(), returns("123")) ("abc")
 ( item() %>>=% item() %>>=% item() %>>=% failure() ) ("abcdefghi")
 
 # testing do function
-do(do=list(x=item(), item(), y=item()), f = function(x,y) {unlist(x,y)}) ("abcdef")
-do(do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("ab")
-parses(do, do=list(x=item(), item(), y=item()), f = function(x,y) {c(x,y)}) ("abcdef")
+do(list(x=item(), item(), y=item(), f = function(x,y) {unlist(x,y)})) ("abcdef")
+do(list(x=item(), item(), y=item(), f = function(x,y) {c(x,y)})) ("ab")
+parses(do, list(x=item(), item(), y=item(), f = function(x,y) {c(x,y)})) ("abcdef")
 
 # testing choice function
 choice(returns("1"), returns("2")) ("abcdef")
@@ -70,11 +70,11 @@ space() ("    abc")
 natural() ("   123  1")
 
 # do many example
-many(do(do=list(y=symbol(","),
-                x=natural()), 
+many(do(list(y=symbol(","),
+                x=natural(), 
         function(x,y){
           unlist(c(y,x))
-        })) (", 123 ,456 ,7, 8, 9 ")
+        }))) (", 123 ,456 ,7, 8, 9 ")
 
 #' below is an example on parsing a list of numbers
 #' The parser will parse things like:
@@ -86,29 +86,20 @@ many(do(do=list(y=symbol(","),
 #' [1,2,]
 #' numlist :: Parser [Int]
 numlist <- function(...) {do(
-  do = list(
+  list(
     symbol("["),
     n=natural(),
-    ns=many(do(do=list(y=symbol(","),
-                       x=natural()), 
-               function(x,y){
-                 unlist(c(y,x))
-                 
-                 # trying to coerce into R object
-                 # this sort of works, but tuples aren't really supported in R
-                 return(c(eval(parse(text=x))))
-               })),
-    symbol("]")
-    ),
+    ns=many(do(list(y=symbol(","),
+                    x=natural(), 
+                    function(x,y){
+                      unlist(c(y,x))
+                    }))),
+    symbol("]"),
   f=function(n,ns){
     #unlist(c("[", n, ns, "]"))
     unlist(c(n, ns))
-    
-    # using eval to actually return an R object...
-    # this sort of works, but tuples aren't really supported in R
-    return(c(eval(parse(text=n)), ns))
-    
-  })}
+  })
+)}
 numlist() ("[12,34,5] abcde")
 parses(numlist) ("[1,2,3] abcde")
 numlist() ("[1,2,] abcde")
@@ -125,18 +116,18 @@ parses(numlist) ("[1,2,] abcde")
 #' unlimited times, using only do lists (not the many function)
 #' this is important because we would need to modify it to accept other
 #' expressions as well
-do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")
+do(list(t=natural(), f=function(t,leftover_) {return(leftover_)})) ("123 123")
 natural() ("123 123")
 
-(do(do=list(t=natural()), 
-    f=function(t,leftover_) {return(t)}) %+++% returns("a")) ("a123 123")
+(do(list(t=natural(), 
+    f=function(t,leftover_) {return(t)})) %+++% returns("a")) ("a123 123")
 
-do(do=list(t=natural()),
+do(list(t=natural(),
    f=function(t, leftover_) {
      then_result <- natural() (leftover_)
      return(list(result=c(unlist(t),unlist(then_result$result)),
                  leftover=then_result$leftover))
-   }) ("1 2")
+   })) ("1 2")
 
 #' exprTest
 #' 
@@ -144,12 +135,12 @@ do(do=list(t=natural()),
 #'          do s <- symbol "+"
 #'            return (t:s)
 #'            +++ return t
-exprTest <- do(do=list(t=natural()),
+exprTest <- do(list(t=natural(),
            f=function(t, leftover_) {
              return(
-               (do(list(x=symbol("+")), function(x) { unlist(c(t,x)) }) %+++% returns(t)) (leftover_)
+               (do(list(x=symbol("+"), function(x) { unlist(c(t,x)) })) %+++% returns(t)) (leftover_)
                )
-           })
+           }))
 
 exprTest("123 + 45")
 
