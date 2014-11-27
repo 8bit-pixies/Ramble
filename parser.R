@@ -62,18 +62,18 @@ then <- function(parserp, parserf) {
 #' Accepts a list of funtions to perform parsing.
 #' 
 #' do : this is is the list of parsers
-#' f : this is the function to be applied, based on the variables in do.
+#'      the list will assume that the last element is the function to be applied, based on the variables in do.
 #'     This function can also pickup "leftovers" via the argument "leftover_" which 
 #'     has been reserved especially for `f`. sample usage: 
 #'     `do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")`
 #' 
 #' For example, `do` can be like:
 #' do=list(x=item(), item(), y=item())
-do <- function(do, f) {
+do <- function(do) {
   return(function(string){
     doResult <- list()
     result <- list(leftover = string)
-    for(element in 1:length(do)) { # What is the apply approach? it will probably be invisible(apply)
+    for(element in 1:(length(do)-1)) { # What is the apply approach? it will probably be invisible(apply)
       if (length(result) == 0){
         return (list()) # no more tokens
       }
@@ -88,7 +88,7 @@ do <- function(do, f) {
     doResult$leftover_ <- result$leftover
     
     # can fail in the final call, we need to check the function call
-    fcall <- R.utils::doCall(f, args=doResult,.ignoreUnusedArgs=TRUE)
+    fcall <- R.utils::doCall(tail(do,1)[[1]], args=doResult,.ignoreUnusedArgs=TRUE)
     if (is.null(fcall)) {
       return(list())
     }
@@ -120,7 +120,7 @@ choice <- function(parserp, parserq) {
 
 #' sat :: (Char -> Bool) -> Parser Char
 sat <- function(p) {
-  do(do=list(x=item()), f = function(x) {
+  do(list(x=item(), function(x) {
     if(p (x)) {
       return(x)
     }
@@ -128,7 +128,7 @@ sat <- function(p) {
       return(c())
     }
   })
-}
+)}
 
 ## define the generic functions
 Digit <- function(...) sat(function(x) {return(!!length(grep("[0-9]", x)))})
@@ -143,10 +143,10 @@ Space <- function(...) sat(function(x) {return(!!length(grep("\\s", x)))})
 String <- function(x) {
   if(x=="") {return(returns(""))}
   else {
-    do(do=list(Char(substr(x,1,1)),
-               String(substring(x,2))),
-       f = function() {return(x)})
-  }
+    do(list(Char(substr(x,1,1)),
+               String(substring(x,2)),
+            function() {return(x)})
+  )}
 }
 
 #' many :: Parser a -> Parser [a]
@@ -158,37 +158,42 @@ many <- function(p) {
 #' many1 :: Parser a -> Parser[a]
 #' many1 matches 1 or more of pattern p
 many1 <- function(p) {
-  do(do=list(v=p,
-             vs=many(p)),
+  do(list(v=p,
+             vs=many(p),
      f = function(v,vs="") {unlist(c(v,vs))})
+  )
 }
 
 #' ident :: Parser String
 #' ident is identify, which is lowercase followed by zero or more alphanumeric
 ident <- function() {
-  do(do = list(x = Lower(),
-               xs = many(AlphaNum())), 
+  do(list(x = Lower(),
+               xs = many(AlphaNum()), 
      f = function(x,xs="") {paste0(x,paste(xs, collapse=''))})
+  )
 }
 
 #' nat :: Parser Int
 nat <- function() {
-  do(do=list(xs = many1(Digit())),
+  do(list(xs = many1(Digit()),
      f = function(xs) {paste(xs, collapse='')})
+  )
 }
 
 #' space :: Parser ()
 space <- function() {
-  do(do=list(xs = many(Space())),
+  do(list(xs = many(Space()),
      f = function(x) {return(list())})
+  )
 }
 
 #' token :: Parser a -> Parser a
 token <- function(p) {
-  do(do = list(space(),
+  do(list(space(),
                v = p,
-               space()), 
+               space(), 
      f = function(v) {v})
+  )
 }
 
 #' identifier :: Parser String
