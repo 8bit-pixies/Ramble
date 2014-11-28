@@ -34,43 +34,41 @@ Example
 =======
 
 ```r
-expr <- do(list(t=term,
-                function(t, leftover_) {
-                  return(
-                    (do(list(s=symbol("+"),
-                             e=expr, 
-                             function(s,e) { 
-                               print(unlist(c(t,s,e)))
-                               return(unlist(c(t,s,e)) )
-                             }))
-                     %+++% returns(t)) (leftover_)
-                  )
-                }))
+expr <- do(f=term, 
+           function(f, leftover_){
+             return(
+               (do(s=symbol("+"),
+                   t=expr,
+                   function(s,t) {
+                     print(unlist(c(f,s,t)))
+                     return(unlist(c(f,s,t)))
+                   })
+                %+++% return(f)) (leftover_)
+             )
+           })
 
-term <- do(list(f=factor, 
-                function(f, leftover_){
-                  return(
-                    (do(list(s=symbol("*"),
-                             t=term,
-                             function(s,t) {
-                               print(unlist(c(f,s,t)))
-                               return(unlist(c(f,s,t)))
-                             }))
-                     %+++% return(f)                 
-                    ) (leftover_)
-                  )
-                }))
+term <- do(f=factor, 
+           function(f, leftover_){
+             return(
+               (do(s=symbol("*"),
+                   t=term,
+                   function(s,t) {
+                     print(unlist(c(f,s,t)))
+                     return(unlist(c(f,s,t)))
+                   })
+                %+++% return(f)) (leftover_)
+             )
+           })
 
-factor <- (do(list(sl=symbol("("),
+factor <- (do(sl=symbol("("),
                    e=expr,
                    sr=symbol(")"),
-                   function(sl, e, sr) {
-                     print(unlist(c(sl, e, sr)))
-                     return(unlist(c(sl, e, sr)))
-                   }))
-           %+++% natural)
+              function(sl, e, sr) {
+                print(unlist(c(sl, e, sr)))
+                return(unlist(c(sl, e, sr)))
+              })
+           %+++% natural ())
 
-expr("1+(2*2)")
 ```
 
 **Output**:  
@@ -101,5 +99,29 @@ $result
 $leftover
 [1] ""
 
+> expr("(1+1)*2")
+[1] "1" "+" "1"
+[1] "(" "1" "+" "1" ")"
+[1] "(" "1" "+" "1" ")" "*" "2"
+$result
+[1] "(" "1" "+" "1" ")" "*" "2"
 
+$leftover
+[1] ""
+
+> expr("1+2")
+[1] "1" "+" "2"
+$result
+[1] "1" "+" "2"
+
+$leftover
+[1] ""
+
+> term("1*1")
+[1] "1" "*" "1"
+$result
+[1] "1" "*" "1"
+
+$leftover
+[1] ""
 ```

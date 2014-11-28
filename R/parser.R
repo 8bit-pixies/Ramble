@@ -72,14 +72,15 @@ then <- function(parserp, parserf) {
 #'     `do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")`
 #' 
 #' For example, `do` can be like:
-#' do(list(x=item(), item(), y=item(), function(x,y){c(x,y)})) ("abcde")
+#' do(x=item(), item(), y=item(), function(x,y){c(x,y)}) ("abcde")
 #' @export
 #' @examples
 #' \dontrun{
-#' do(list(x=item, item, y=item, f = function(x,y) {unlist(x,y)})) ("abcdef")
-#' do(list(x=item, item, y=item, f = function(x,y) {c(x,y)})) ("ab")
+#' do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")
+#' do(x=item(), item, y=item(), f = function(x,y) {c(x,y)}) ("ab")
 #' }
-do <- function(do) {
+do <- function(...) {
+  do <- list(...)
   return(function(string){
     doResult <- list()
     result <- list(leftover = string)
@@ -131,7 +132,7 @@ choice <- function(parserp, parserq) {
 #' @export
 #' @examples
 #' \dontrun{
-#' (item %+++% returns("2")) ("abcdef")
+#' (item() %+++% returns("2")) ("abcdef")
 #' }
 `%+++%` <- choice
 
@@ -139,7 +140,7 @@ choice <- function(parserp, parserq) {
 #' sat || (Char -> Bool) -> Parser Char
 #' @export
 sat <- function(p) {
-  do(list(x=item(), function(x) {
+  do(x=item(), function(x) {
     if(p (x)) {
       return(x)
     }
@@ -147,7 +148,7 @@ sat <- function(p) {
       return(c())
     }
   })
-  )}
+  }
 
 ## define the generic functions
 
@@ -226,10 +227,10 @@ Space <- function(...) sat(function(x) {return(!!length(grep("\\s", x)))})
 String <- function(x) {
   if(x=="") {return(returns(""))}
   else {
-    do(list(Char(substr(x,1,1)),
+    do(Char(substr(x,1,1)),
             String(substring(x,2)),
             function() {return(x)})
-    )}
+    }
 }
 
 #' many matches 0 or more of pattern p
@@ -254,10 +255,10 @@ many <- function(p) {
 #' many1(Digit()) ("123abc")
 #' }
 many1 <- function(p) {
-  do(list(v=p,
+  do(v=p,
           vs=many(p),
           f = function(v,vs="") {unlist(c(v,vs))})
-  )
+  
 }
 
 #' ident is identify, which is lowercase followed by zero or more alphanumeric
@@ -268,10 +269,10 @@ many1 <- function(p) {
 #' ident() ("variable1 = 123")
 #' }
 ident <- function() {
-  do(list(x = Lower(),
+  do(x = Lower(),
           xs = many(AlphaNum()), 
           f = function(x,xs="") {paste0(x,paste(xs, collapse=''))})
-  )
+  
 }
 
 #' nat matches natural numbers
@@ -282,9 +283,7 @@ ident <- function() {
 #'   nat() ("123 + 456")
 #' }
 nat <- function() {
-  do(list(xs = many1(Digit()),
-          f = function(xs) {paste(xs, collapse='')})
-  )
+  do(xs = many1(Digit()),f = function(xs) {paste(xs, collapse='')})  
 }
 
 #' space matches spaces
@@ -295,9 +294,7 @@ nat <- function() {
 #' space() ("  abc")
 #' }
 space <- function() {
-  do(list(xs = many(Space()),
-          f = function(x) {return(list())})
-  )
+  do(xs = many(Space()),f = function(x) {return(list())})
 }
 
 #' token strips spaces as needed
@@ -308,11 +305,10 @@ space <- function() {
 #' token(ident()) ("   variable1   ")
 #' }
 token <- function(p) {
-  do(list(space(),
+  do(space(),
           v = p,
           space(), 
           f = function(v) {v})
-  )
 }
 
 #' identifier creates an identifier
