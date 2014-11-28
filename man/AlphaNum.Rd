@@ -3,7 +3,7 @@
 \alias{AlphaNum}
 \title{AlphaNum checks for a single alphanumeric character}
 \usage{
-AlphaNum(string)
+AlphaNum(...)
 }
 \description{
 AlphaNum checks for a single alphanumeric character

@@ -11,7 +11,7 @@ Bind/then function.
 \examples{
 \dontrun{
 ( item \%>>=\% returns("123") ) ("abc")
-( item() \%>>=\% item() \%>>=\% item() \%>>=\% failure() ) ("abcdefghi")
+( item() \%>>=\% item() \%>>=\% item() \%>>=\% list() ) ("abcdefghi")
 }
 }
 

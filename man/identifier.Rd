@@ -3,7 +3,7 @@
 \alias{identifier}
 \title{identifier creates an identifier}
 \usage{
-identifier(string)
+identifier(...)
 }
 \description{
 identifier creates an identifier

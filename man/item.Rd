@@ -4,7 +4,7 @@
 \title{item matches a single string
 item || Parser Char}
 \usage{
-item(string)
+item(...)
 }
 \description{
 item matches a single string

@@ -3,7 +3,7 @@
 \alias{Lower}
 \title{Lower checks for single lower case character}
 \usage{
-Lower(string)
+Lower(...)
 }
 \description{
 Lower checks for single lower case character

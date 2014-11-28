@@ -4,7 +4,7 @@
 \title{nat matches natural numbers
 nat || Parser Int}
 \usage{
-nat(string)
+nat()
 }
 \description{
 nat matches natural numbers

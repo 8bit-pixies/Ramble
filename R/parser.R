@@ -12,27 +12,19 @@ returns <- function(string) {
   })
 }
 
-#' failure is a parser which always fails
-#' failure || a -> []
-#' 
-#' @export
-#' @examples
-#' \dontrun{
-#' failure ("abc")
-#' }
-failure <- function(string) return(list())
-
 #' item matches a single string
 #' item || Parser Char
 #' 
 #' @export
 #' @examples
 #' \dontrun{
-#' item ("abc")
-#' item ("")
+#' item() ("abc")
+#' item() ("")
 #' }
-item <- function(string){
-  return (if(string=="") failure() else list(result=substr(string, 1, 1), leftover=substring(string, 2)))
+item <- function(...){
+  return(function(string){
+    return (if(string=="") list() else list(result=substr(string, 1, 1), leftover=substring(string, 2)))
+  })
 }
 
 #' then is also know as the bind function.
@@ -46,13 +38,13 @@ item <- function(string){
 #' 
 #' This is also known as the bind function
 #' \dontrun{
-#' then(item, returns("123")) ("abc")
+#' then(item(), returns("123")) ("abc")
 #' }
 then <- function(parserp, parserf) {
   return(function(string) {
     result <- parserp (string)
     if (length(result) == 0) {
-      return (failure)
+      return (list())
     }
     else {
       result_ <- parserf (result$leftover)
@@ -66,8 +58,7 @@ then <- function(parserp, parserf) {
 #' @export
 #' @examples
 #' \dontrun{
-#' ( item %>>=% returns("123") ) ("abc")
-#' ( item() %>>=% item() %>>=% item() %>>=% failure() ) ("abcdefghi")
+#' ( item() %>>=% returns("123") ) ("abc")
 #' }
 `%>>=%` <- then
 
@@ -81,7 +72,7 @@ then <- function(parserp, parserf) {
 #'     `do(do=list(t=natural()), f=function(t,leftover_) {return(leftover_)}) ("123 123")`
 #' 
 #' For example, `do` can be like:
-#' do=list(x=item(), item(), y=item())
+#' do(list(x=item(), item(), y=item(), function(x,y){c(x,y)})) ("abcde")
 #' @export
 #' @examples
 #' \dontrun{
@@ -90,14 +81,14 @@ then <- function(parserp, parserf) {
 #' }
 do <- function(do) {
   return(function(string){
-    doResult <- failure
+    doResult <- list()
     result <- list(leftover = string)
     for(element in 1:(length(do)-1)) { # What is the apply approach? it will probably be invisible(apply)
       if (length(result) == 0){
-        return (failure) # no more tokens
+        return (list()) # no more tokens
       }
       result_ <-  do[[element]] (result$leftover) # apply the current function
-      if(is.null(result_$leftover)) {return(failure)} # only succeeds if every parser in the sequence succeeds
+      if(is.null(result_$leftover)) {return(list())} # only succeeds if every parser in the sequence succeeds
       tryCatch({doResult[[names(do[element])]] <- result_$result},
                error=function(x) {return(NA)},
                warning=function(x) {return(NULL)}) # try catch to ensure that the token is assigned (if it is meant to be assigned), otherwise it is discarded
@@ -107,9 +98,9 @@ do <- function(do) {
     doResult$leftover_ <- result$leftover
     
     # can fail in the final call, we need to check the function call
-    fcall <- R.utils||doCall(tail(do,1)[[1]], args=doResult,.ignoreUnusedArgs=TRUE)
+    fcall <- R.utils::doCall(tail(do,1)[[1]], args=doResult,.ignoreUnusedArgs=TRUE)
     if (is.null(fcall)) {
-      return(failure)
+      return(list())
     }
     else if ("leftover" %in% names(fcall)) {
       # if fcall returns a list with the element leftover, we need to take that one
@@ -148,7 +139,7 @@ choice <- function(parserp, parserq) {
 #' sat || (Char -> Bool) -> Parser Char
 #' @export
 sat <- function(p) {
-  do(list(x=item, function(x) {
+  do(list(x=item(), function(x) {
     if(p (x)) {
       return(x)
     }
@@ -165,46 +156,46 @@ sat <- function(p) {
 #' @export
 #' @examples
 #' \dontrun{
-#' Digit("123")
+#' Digit()("123")
 #' }
-Digit <- sat(function(x) {return(!!length(grep("[0-9]", x)))})
+Digit <- function(...) {sat(function(x) {return(!!length(grep("[0-9]", x)))})}
 
 #' Lower checks for single lower case character
 #' 
 #' @export
 #' @examples
 #' \dontrun{
-#' Digit("123")
+#' Lower() ("abc")
 #' }
-Lower <- sat(function(x) {return(!!length(grep("[a-z]", x)))})
+Lower <- function(...) {sat(function(x) {return(!!length(grep("[a-z]", x)))})}
 
 #' Upper checks for a single upper case character
 #' 
 #' @export
 #' @examples
 #' \dontrun{
-#' Upper("Abc")
+#' Upper()("Abc")
 #' }
-Upper <- sat(function(x) {return(!!length(grep("[A-Z]", x)))})
+Upper <- function(...) sat(function(x) {return(!!length(grep("[A-Z]", x)))})
 
 #' Alpha checks for single alphabet character
 #' 
 #' @export
 #' @examples
 #' \dontrun{
-#' Alpha("abc")
+#' Alpha()("abc")
 #' }
-Alpha <- sat(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+Alpha <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z]", x)))})
 
 #' AlphaNum checks for a single alphanumeric character
 #' 
 #' @export
 #' @examples
 #' \dontrun{
-#' AlphaNum("123")
-#' AlphaNum("abc123")
+#' AlphaNum()("123")
+#' AlphaNum()("abc123")
 #' }
-AlphaNum <- sat(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
+AlphaNum <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
 
 #' char checks for a single character of your choice
 #' 
@@ -220,9 +211,9 @@ Char <- function(c) {sat(function(x) {return(c==x)})}
 #' @export
 #' @examples
 #' \dontrun{
-#' Space(" 123")
+#' Space()(" 123")
 #' }
-Space <- sat(function(x) {return(!!length(grep("\\s", x)))})
+Space <- function(...) sat(function(x) {return(!!length(grep("\\s", x)))})
 
 #' String tries to match a whole string
 #' string || String -> Parser String
@@ -247,11 +238,11 @@ String <- function(x) {
 #' @export
 #' @examples
 #' \dontrun{
-#' many(Digit) ("123abc")
-#' many(Digit) ("abc")
+#' many(Digit()) ("123abc")
+#' many(Digit()) ("abc")
 #' }
 many <- function(p) {
-  many1 (p) %+++% returns(failure)
+  many1 (p) %+++% returns(list())
 }
 
 #' many1 matches 1 or more of pattern p
@@ -260,7 +251,7 @@ many <- function(p) {
 #' @export
 #' @examples
 #' \dontrun{
-#' many1(Digit) ("123abc")
+#' many1(Digit()) ("123abc")
 #' }
 many1 <- function(p) {
   do(list(v=p,
@@ -274,45 +265,52 @@ many1 <- function(p) {
 #' @export
 #' @examples
 #' \dontrun{
-#' ident ("variable1 = 123")
+#' ident() ("variable1 = 123")
 #' }
-ident <-   do(list(x = Lower,
-          xs = many(AlphaNum), 
-          f = function(x,xs="") {paste0(x,paste(xs, collapse=''))}))
+ident <- function() {
+  do(list(x = Lower(),
+          xs = many(AlphaNum()), 
+          f = function(x,xs="") {paste0(x,paste(xs, collapse=''))})
+  )
+}
 
 #' nat matches natural numbers
 #' nat || Parser Int
 #' @export
 #' @examples
 #' \dontrun{
-#'   nat ("123 + 456")
+#'   nat() ("123 + 456")
 #' }
-nat <- 
-  do(list(xs = many1(Digit),
+nat <- function() {
+  do(list(xs = many1(Digit()),
           f = function(xs) {paste(xs, collapse='')})
   )
+}
 
 #' space matches spaces
 #' space || Parser ()
 #' @export
 #' @examples
 #' \dontrun{
-#' space ("  abc")
+#' space() ("  abc")
 #' }
-space <- do(list(xs = many(Space),
-          f = function(x) {return(failure)}))
+space <- function() {
+  do(list(xs = many(Space()),
+          f = function(x) {return(list())})
+  )
+}
 
 #' token strips spaces as needed
 #' token || Parser a -> Parser a
 #' @export
 #' @examples
 #' \dontrun{
-#' token(ident) ("   variable1   ")
+#' token(ident()) ("   variable1   ")
 #' }
 token <- function(p) {
-  do(list(space,
+  do(list(space(),
           v = p,
-          space, 
+          space(), 
           f = function(v) {v})
   )
 }
@@ -320,10 +318,10 @@ token <- function(p) {
 #' identifier creates an identifier
 #' 
 #' @export
-identifier <- token(ident)
+identifier <- function(...) {token(ident())}
 
 #' @export
-natural <- token(nat)
+natural <- function(...) {token(nat())}
 
 #' Symbol creates a token for a symbol
 #' @export

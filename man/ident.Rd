@@ -4,7 +4,7 @@
 \title{ident is identify, which is lowercase followed by zero or more alphanumeric
 ident || Parser String}
 \usage{
-ident(string)
+ident()
 }
 \description{
 ident is identify, which is lowercase followed by zero or more alphanumeric

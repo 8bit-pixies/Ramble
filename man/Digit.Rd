@@ -3,14 +3,14 @@
 \alias{Digit}
 \title{Digit checks for single digit}
 \usage{
-Digit(string)
+Digit(...)
 }
 \description{
 Digit checks for single digit
 }
 \examples{
 \dontrun{
-Digit("123")
+Digit()("123")
 }
 }
 

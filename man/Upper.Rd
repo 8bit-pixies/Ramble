@@ -3,7 +3,7 @@
 \alias{Upper}
 \title{Upper checks for a single upper case character}
 \usage{
-Upper(string)
+Upper(...)
 }
 \description{
 Upper checks for a single upper case character

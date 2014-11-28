@@ -4,7 +4,7 @@
 \title{space matches spaces
 space || Parser ()}
 \usage{
-space(string)
+space()
 }
 \description{
 space matches spaces

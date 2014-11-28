@@ -3,7 +3,7 @@
 \alias{Alpha}
 \title{Alpha checks for single alphabet character}
 \usage{
-Alpha(string)
+Alpha(...)
 }
 \description{
 Alpha checks for single alphabet character
