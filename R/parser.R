@@ -84,6 +84,8 @@ do <- function(...) {
   return(function(string){
     doResult <- list()
     result <- list(leftover = string)
+    
+    # a try function would be helpful here!
     for(element in 1:(length(do)-1)) { # What is the apply approach? it will probably be invisible(apply)
       if (length(result) == 0){
         return (list()) # no more tokens
