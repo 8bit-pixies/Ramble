@@ -48,6 +48,11 @@ then <- function(parserp, parserf) {
     }
     else {
       result_ <- parserf (result$leftover)
+      # need to combine two lists, and extend it if they share the same key
+      # e.g.
+      # list(result=1)  +  list(result=2, var=c(1,2,3))
+      # would be
+      # list(result=c(1,2), var=c(1,2,3))
       return(list(result=c(result$result, result_$result), leftover=result_$leftover))
     }
   })
