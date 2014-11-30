@@ -1,46 +1,78 @@
 #' @import R.utils
 NULL
 
-#' returns is a function which always succeeds
-#' returns || a -> Parser a
+#' \code{succeed} is based on the empty string symbol in the BNF notation The 
+#' \code{succeed} parser always succeeds, without actually consuming any input 
+#' string. Since the outcome of succeed does not depend on its input, its result
+#' value must be pre-detemined, so it is included as an extra parameter.
 #' 
+#' @param string the result value of succeed parser
 #' @export
-#' @examples
-#' \dontrun{
-#' returns("1") ("abc")
-#' }
-returns <- function(string) {
+#' @examples 
+#' succeed("1") ("abc")
+succeed <- function(string) {
   return(function(nextString) {
     return(list(result = string, leftover=nextString))
   })
 }
 
-#' item matches a single string
-#' item || Parser Char
+#' item is a parser that consumes the first character of the string and returns
+#' the rest. If it cannot consume a single character from the string, it will
+#' emit the empty list, indicating the parser has failed.
 #' 
 #' @export
 #' @examples
-#' \dontrun{
 #' item() ("abc")
 #' item() ("")
-#' }
 item <- function(...){
   return(function(string){
     return (if(string=="") list() else list(result=substr(string, 1, 1), leftover=substring(string, 2)))
   })
 }
 
-#' then is also know as the bind function.
-#' then || Parser a -> (a -> Parser b) -> Parser b
+#' \code{satisfy} is a function which allows us to make parsers that recognise single symbols. 
 #' 
-#' Usage: then(p, f) would be the same as p `then` f. Alternatively, 
-#' in the piping world, it would look like:
-#' ```
-#' (parserp(...) %>=% parserf(...)) (string)
-#' ```
+#' @param p is the predicate to determine if the arbitrary symbol is a member.
+#' @export
+satisfy <- function(p) {
+  do(x=item(), function(x) {
+    if(p (x)) {
+      return(x)
+    }
+    else {
+      return(c())
+    }
+  })
+}
+
+## Building Combinators ##
+
+#' \code{alt} combinator is similar to alternation in BNF. the parser 
+#' \code{(then(p1, p2))} recognises anything that \code{p1} or \code{p2} would. 
+#' The approach taken in this parser follows (Fairbairn86), in which either is 
+#' interpretted in a sequential (or exclusive) manner, returning the result of
+#' the first parser to succeed, and failure if neither does.
+alt <- function(p1, p2) {
+  return(function(string){
+    result <- p1 (string)
+    if(!is.null(result$leftover)) {return(result)}
+    return(p2 (string))    
+  })
+}
+
+#' \code{\%+++\%} is the infix notation for the \code{alt} function. 
 #' 
-#' This is also known as the bind function
-#' `then(item(), returns("123")) ("abc")`
+#' @export
+#' @examples
+#' (item() %+++% succeed("2")) ("abcdef")
+`%+++%` <- alt
+`%alt%` <- alt
+
+#' \code{then} combinator corresponds to sequencing in BNF. The parser 
+#' \code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would 
+#' if placed in succession. In this manner, two results are produced for each
+#' successful parse, one from each parser. They are combined (by pairing) to
+#' form a single result for the compound parser.
 then <- function(parserp, parserf) {
   return(function(string) {
     result <- parserp (string)
@@ -49,24 +81,109 @@ then <- function(parserp, parserf) {
     }
     else {
       result_ <- parserf (result$leftover)
-      # need to combine two lists, and extend it if they share the same key
-      # e.g.
-      # list(result=1)  +  list(result=2, var=c(1,2,3))
-      # would be
-      # list(result=c(1,2), var=c(1,2,3))
       return(list(result=c(result$result, result_$result), leftover=result_$leftover))
     }
   })
 }
 
-#' Bind/then function. 
+#' \code{\%then\%} is the infix operator for the then combinator.
 #' 
 #' @export
 #' @examples
-#' \dontrun{
-#' ( item() %>>=% returns("123") ) ("abc")
-#' }
-`%>>=%` <- then
+#' (item() %then% succeed("123")) ("abc")
+`%then%` <- then
+
+#' \code{using} combinator allows us to manipulate results from a parser, for 
+#' example building a parse tree. The parser \code{(p \%using\% f)} has the same 
+#' behaviour as the parser \code{p}, except that the function \code{f} is
+#' applied to each of its result values.
+#' 
+#' @param p is the parser to be applied
+#' @param f is the function to be applied to each result of \code{p}.
+using <- function(p, f) {
+  return(function(string) {
+    result <- p (string) 
+    if(length(result) == 0) {return(list())}
+    return(list(result=f(result$result),
+                leftover=result$leftover))
+  })
+}
+
+#' \code{\%using\%} is the infix operator for using
+#' 
+#' @export
+#' @examples
+#' (item() %using% as.numeric) ("1")
+`%using%` <- using
+
+#' \code{many} matches 0 or more of pattern \code{p}. In BNF notation, 
+#' repetition occurs often enough to merit its own abbreviation. When zero or 
+#' more repetitions of a phrase \code{p} are admissible, we simply write 
+#' \code{p*}. The \code{many} combinator corresponds directly to this operator,
+#' and is defined in much the same way.
+#' 
+#' @param p is the parser to matched 0 or more times.
+#' @export
+#' @examples
+#' many(Digit()) ("123abc")
+#' many(Digit()) ("abc")
+many <- function(p) {
+  return(function(string) {
+    (((p %then% many(p)) %using% function(x) {unlist(c(x))}) %alt% succeed(NULL)) (string)
+  })  
+}
+
+#' \code{some} matches 1 or more of pattern \code{p}. in BNF notation, repetition occurs often enough to merit its own abbreviation. When zero or 
+#' more repetitions of a phrase \code{p} are admissible, we simply write 
+#' \code{p+}. The \code{some} combinator corresponds directly to this operator,
+#' and is defined in much the same way.
+#' 
+#' @param p is the parser to matched 1 or more times.
+#' @export
+#' @examples
+#' some(Digit()) ("123abc")
+some <- function(p) {
+  return(function(string){
+    ((p %then% many(p)) %using% function(x) {unlist(c(x))}) (string)
+  })
+}
+
+## define the generic functions
+
+#' \code{number} is a parser for numbers
+#' 
+#' @export
+#' @examples
+#' number()("123")
+number <- function(...) {some (satisfy(function(x) {return(!!length(grep("[0-9]", x)))}))}
+
+#' \code{word} is a parser for words
+#' 
+#' @export
+#' @examples
+#' word()("abc")
+word <- function(...) {some (satisfy(function(x) {return(!!length(grep("[a-zA-Z]", x)))}))}
+
+#' \code{string} is a combinator which allows us to build parsers whcih
+#' recognise strings of symbols, rather than just single symbols
+#' 
+#' @param string is the string to be matched
+#' @export
+#' @examples
+#' string("123")("123 abc")
+string <- function(string) {
+  if (string=="") {
+    return (succeed(NULL))
+  }
+  else {
+    result_=substr(string, 1, 1)
+    leftover_=substring(string, 2)
+    return((satisfy(function(x){return(x==result_)}) %then% 
+        string(leftover_)) %using% 
+        function(x) {unlist(c(x))})
+  }
+}
+
 
 #' Accepts a list of funtions to perform parsing. The last element is assumed to be the return(ing) function
 #' doList || Parser a -> Parsec b -> ... -> Parser n -> (a -> b -> ... -> n -> Parser n) -> Parser n
@@ -112,7 +229,7 @@ do <- function(...) {
       return(list())
     }
     else if ("leftover" %in% names(fcall)) {
-      # if fcall returns a list with the element leftover, we need to take that one
+      # if fcall succeed a list with the element leftover, we need to take that one
       return(list(result = fcall$result, leftover=fcall$leftover))
     }
     else {
@@ -121,45 +238,6 @@ do <- function(...) {
   }
   )}
 
-#' choice (or else)
-#' (+++) || Parser a -> Parser a -> Parser a
-#' choice(returns("1"), returns("2")) ("abcdef")
-choice <- function(parserp, parserq) {
-  return(function(string){
-    result <- parserp (string)
-    if(!is.null(result$leftover)) {return(result)}
-    return(parserq (string))    
-  })
-}
-
-#' binary operand for choice
-#' Usage:
-#' ```
-#' (item() %+++% returns("2")) ("abcdef")
-#' ```
-#' @export
-#' @examples
-#' \dontrun{
-#' (item() %+++% returns("2")) ("abcdef")
-#' }
-`%+++%` <- choice
-
-#' sat is
-#' sat || (Char -> Bool) -> Parser Char
-#' @export
-sat <- function(p) {
-  do(x=item(), function(x) {
-    if(p (x)) {
-      return(x)
-    }
-    else {
-      return(c())
-    }
-  })
-  }
-
-## define the generic functions
-
 #' Digit checks for single digit
 #' 
 #' @export
@@ -167,7 +245,7 @@ sat <- function(p) {
 #' \dontrun{
 #' Digit()("123")
 #' }
-Digit <- function(...) {sat(function(x) {return(!!length(grep("[0-9]", x)))})}
+Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 
 #' Lower checks for single lower case character
 #' 
@@ -176,7 +254,7 @@ Digit <- function(...) {sat(function(x) {return(!!length(grep("[0-9]", x)))})}
 #' \dontrun{
 #' Lower() ("abc")
 #' }
-Lower <- function(...) {sat(function(x) {return(!!length(grep("[a-z]", x)))})}
+Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))})}
 
 #' Upper checks for a single upper case character
 #' 
@@ -185,7 +263,7 @@ Lower <- function(...) {sat(function(x) {return(!!length(grep("[a-z]", x)))})}
 #' \dontrun{
 #' Upper()("Abc")
 #' }
-Upper <- function(...) sat(function(x) {return(!!length(grep("[A-Z]", x)))})
+Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
 
 #' Alpha checks for single alphabet character
 #' 
@@ -194,7 +272,7 @@ Upper <- function(...) sat(function(x) {return(!!length(grep("[A-Z]", x)))})
 #' \dontrun{
 #' Alpha()("abc")
 #' }
-Alpha <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
 
 #' AlphaNum checks for a single alphanumeric character
 #' 
@@ -204,16 +282,16 @@ Alpha <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z]", x)))})
 #' AlphaNum()("123")
 #' AlphaNum()("abc123")
 #' }
-AlphaNum <- function(...) sat(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
+AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
 
-#' char checks for a single character of your choice
+#' char checks for a single character of your then
 #' 
 #' @export
 #' @examples
 #' \dontrun{
 #' Char("a")("abc")
 #' }
-Char <- function(c) {sat(function(x) {return(c==x)})}
+Char <- function(c) {satisfy(function(x) {return(c==x)})}
 
 #' Space checks for a single space character
 #' 
@@ -222,7 +300,7 @@ Char <- function(c) {sat(function(x) {return(c==x)})}
 #' \dontrun{
 #' Space()(" 123")
 #' }
-Space <- function(...) sat(function(x) {return(!!length(grep("\\s", x)))})
+Space <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
 
 #' String tries to match a whole string
 #' string || String -> Parser String
@@ -233,40 +311,12 @@ Space <- function(...) sat(function(x) {return(!!length(grep("\\s", x)))})
 #' String("test")("test123")
 #' }
 String <- function(x) {
-  if(x=="") {return(returns(""))}
+  if(x=="") {return(succeed(""))}
   else {
     do(Char(substr(x,1,1)),
             String(substring(x,2)),
             function() {return(x)})
     }
-}
-
-#' many matches 0 or more of pattern p
-#' many || Parser a -> Parser [a]
-#' 
-#' @export
-#' @examples
-#' \dontrun{
-#' many(Digit()) ("123abc")
-#' many(Digit()) ("abc")
-#' }
-many <- function(p) {
-  many1 (p) %+++% returns(list())
-}
-
-#' many1 matches 1 or more of pattern p
-#' many1 || Parser a -> Parser[a]
-#'
-#' @export
-#' @examples
-#' \dontrun{
-#' many1(Digit()) ("123abc")
-#' }
-many1 <- function(p) {
-  do(v=p,
-          vs=many(p),
-          f = function(v,vs="") {unlist(c(v,vs))})
-  
 }
 
 #' ident is identify, which is lowercase followed by zero or more alphanumeric
