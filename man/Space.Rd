@@ -12,7 +12,7 @@ space || Parser ()
 }
 \examples{
 \dontrun{
-space ("  abc")
+space() ("  abc")
 }
 }
 

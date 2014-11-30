@@ -12,7 +12,7 @@ token || Parser a -> Parser a
 }
 \examples{
 \dontrun{
-token(ident) ("   variable1   ")
+token(ident()) ("   variable1   ")
 }
 }
 

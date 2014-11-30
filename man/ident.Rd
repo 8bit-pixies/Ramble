@@ -12,7 +12,7 @@ ident || Parser String
 }
 \examples{
 \dontrun{
-ident ("variable1 = 123")
+ident() ("variable1 = 123")
 }
 }
 

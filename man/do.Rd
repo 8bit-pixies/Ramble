@@ -4,7 +4,7 @@
 \title{Accepts a list of funtions to perform parsing. The last element is assumed to be the return(ing) function
 doList || Parser a -> Parsec b -> ... -> Parser n -> (a -> b -> ... -> n -> Parser n) -> Parser n}
 \usage{
-do(do)
+do(...)
 }
 \description{
 do : this is is the list of parsers
@@ -15,12 +15,12 @@ do : this is is the list of parsers
 }
 \details{
 For example, `do` can be like:
-do=list(x=item(), item(), y=item())
+do(x=item(), item(), y=item(), function(x,y){c(x,y)}) ("abcde")
 }
 \examples{
 \dontrun{
-do(list(x=item, item, y=item, f = function(x,y) {unlist(x,y)})) ("abcdef")
-do(list(x=item, item, y=item, f = function(x,y) {c(x,y)})) ("ab")
+do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")
+do(x=item(), item, y=item(), f = function(x,y) {c(x,y)}) ("ab")
 }
 }
 

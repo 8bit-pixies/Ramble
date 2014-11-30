@@ -10,7 +10,7 @@ Upper checks for a single upper case character
 }
 \examples{
 \dontrun{
-Upper("Abc")
+Upper()("Abc")
 }
 }
 

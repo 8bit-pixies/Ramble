@@ -12,8 +12,8 @@ item || Parser Char
 }
 \examples{
 \dontrun{
-item ("abc")
-item ("")
+item() ("abc")
+item() ("")
 }
 }
 

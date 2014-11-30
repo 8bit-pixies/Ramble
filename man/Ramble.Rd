@@ -3,6 +3,8 @@
 \name{Ramble}
 \alias{Ramble}
 \alias{Ramble-package}
+\alias{package-ramble}
+\alias{ramble}
 \title{Ramble is a parser generator using combinatory parsers.}
 \description{
 Ramble allows you to write parsers in a functional manner, inspired by

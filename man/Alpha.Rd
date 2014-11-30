@@ -10,7 +10,7 @@ Alpha checks for single alphabet character
 }
 \examples{
 \dontrun{
-Alpha("abc")
+Alpha()("abc")
 }
 }
 

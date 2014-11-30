@@ -5,4 +5,5 @@
 #' 
 #' @docType package
 #' @name Ramble
+#' @aliases Ramble ramble package-ramble
 NULL

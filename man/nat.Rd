@@ -12,7 +12,7 @@ nat || Parser Int
 }
 \examples{
 \dontrun{
-  nat ("123 + 456")
+  nat() ("123 + 456")
 }
 }
 

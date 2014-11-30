@@ -12,8 +12,8 @@ many || Parser a -> Parser [a]
 }
 \examples{
 \dontrun{
-many(Digit) ("123abc")
-many(Digit) ("abc")
+many(Digit()) ("123abc")
+many(Digit()) ("abc")
 }
 }
 

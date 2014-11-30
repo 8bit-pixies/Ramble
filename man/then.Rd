@@ -15,8 +15,6 @@ in the piping world, it would look like:
 }
 \details{
 This is also known as the bind function
-\dontrun{
-then(item, returns("123")) ("abc")
-}
+`then(item(), returns("123")) ("abc")`
 }
 

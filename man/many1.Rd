@@ -12,7 +12,7 @@ many1 || Parser a -> Parser[a]
 }
 \examples{
 \dontrun{
-many1(Digit) ("123abc")
+many1(Digit()) ("123abc")
 }
 }
 

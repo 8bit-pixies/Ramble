@@ -10,7 +10,7 @@ Lower checks for single lower case character
 }
 \examples{
 \dontrun{
-Digit("123")
+Lower() ("abc")
 }
 }
 

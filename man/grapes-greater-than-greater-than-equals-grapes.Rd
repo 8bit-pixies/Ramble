@@ -10,8 +10,7 @@ Bind/then function.
 }
 \examples{
 \dontrun{
-( item \%>>=\% returns("123") ) ("abc")
-( item() \%>>=\% item() \%>>=\% item() \%>>=\% list() ) ("abcdefghi")
+( item() \%>>=\% returns("123") ) ("abc")
 }
 }
 

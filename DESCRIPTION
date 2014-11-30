@@ -8,6 +8,8 @@ Maintainer: Chapman Siu <chapm0n.siu@gmail.com>
 Description: Ramble is a parser generator for R using combinatory parsers. It
     is inspired by combinatory parsers developed in Haskell.
 License: MIT
+Imports:
+    R.utils
 Suggests:
     testthat,
     knitr

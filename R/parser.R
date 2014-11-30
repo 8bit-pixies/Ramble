@@ -1,3 +1,6 @@
+#' @import R.utils
+NULL
+
 #' returns is a function which always succeeds
 #' returns || a -> Parser a
 #' 
@@ -37,9 +40,7 @@ item <- function(...){
 #' ```
 #' 
 #' This is also known as the bind function
-#' \dontrun{
-#' then(item(), returns("123")) ("abc")
-#' }
+#' `then(item(), returns("123")) ("abc")`
 then <- function(parserp, parserf) {
   return(function(string) {
     result <- parserp (string)

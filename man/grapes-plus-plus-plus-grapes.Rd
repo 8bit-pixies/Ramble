@@ -18,7 +18,7 @@ Usage:
 }
 \examples{
 \dontrun{
-(item \%+++\% returns("2")) ("abcdef")
+(item() \%+++\% returns("2")) ("abcdef")
 }
 }
 
