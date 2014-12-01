@@ -178,63 +178,6 @@ some <- function(p) {
   })
 }
 
-#' 
-#' \code{do} combinator
-#' 
-#' Accepts a list of funtions to perform parsing. The last element is assumed to
-#' be the return(ing) function
-#' 
-#' do : this is is the list of parsers the list will assume that the last
-#' element is the function to be applied, based on the variables in do. This
-#' function can also pickup "leftovers" via the argument "leftover_" which has
-#' been reserved especially for `f`. sample usage: `do(do=list(t=natural()),
-#' f=function(t,leftover_) {return(leftover_)}) ("123 123")`
-#' 
-#' For example, `do` can be like: do(x=item(), item(), y=item(),
-#' function(x,y){c(x,y)}) ("abcde")
-#' @export
-#' @examples
-#' do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")
-#' do(x=item(), item, y=item(), f = function(x,y) {c(x,y)}) ("ab")
-do <- function(...) {
-  .Deprecated("do function can be replicated with 'then' and 'using'")
-  do <- list(...)
-  return(function(string){
-    doResult <- list()
-    result <- list(leftover = string)
-    
-    # a try function would be helpful here!
-    for(element in 1:(length(do)-1)) { # What is the apply approach? it will probably be invisible(apply)
-      if (length(result) == 0){
-        return (list()) # no more tokens
-      }
-      result_ <-  do[[element]] (result$leftover) # apply the current function
-      if(is.null(result_$leftover)) {return(list())} # only succeeds if every parser in the sequence succeeds
-      tryCatch({doResult[[names(do[element])]] <- result_$result},
-               error=function(x) {return(NA)},
-               warning=function(x) {return(NULL)}) # try catch to ensure that the token is assigned (if it is meant to be assigned), otherwise it is discarded
-      result$leftover <- result_$leftover
-    }
-    
-    doResult$leftover_ <- result$leftover
-    
-    # can fail in the final call, we need to check the function call
-    fcall <- R.utils::doCall(tail(do,1)[[1]], args=doResult,.ignoreUnusedArgs=TRUE)
-    if (is.null(fcall)) {
-      return(list())
-    }
-    else if ("leftover" %in% names(fcall)) {
-      # if fcall returns a list with the element leftover, we need to take that one
-      return(list(result = fcall$result, leftover=fcall$leftover))
-    }
-    else {
-      return(list(result = fcall, leftover=result$leftover))
-    }
-  }
-  )}
-
-
-
 ## Define the Generic Parsers ##
 
 #' Digit checks for single digit
