@@ -9,8 +9,6 @@ Digit(...)
 Digit checks for single digit
 }
 \examples{
-\dontrun{
 Digit()("123")
-}
 }
 

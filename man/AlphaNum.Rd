@@ -9,9 +9,7 @@ AlphaNum(...)
 AlphaNum checks for a single alphanumeric character
 }
 \examples{
-\dontrun{
 AlphaNum()("123")
 AlphaNum()("abc123")
-}
 }
 

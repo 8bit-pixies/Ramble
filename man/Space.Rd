@@ -11,8 +11,6 @@ space matches spaces
 space || Parser ()
 }
 \examples{
-\dontrun{
 space() ("  abc")
-}
 }
 

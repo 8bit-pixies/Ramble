@@ -9,8 +9,6 @@ Char(c)
 char checks for a single character of your choice
 }
 \examples{
-\dontrun{
 Char("a")("abc")
-}
 }
 

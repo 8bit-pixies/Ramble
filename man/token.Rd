@@ -11,8 +11,6 @@ token strips spaces as needed
 token || Parser a -> Parser a
 }
 \examples{
-\dontrun{
 token(ident()) ("   variable1   ")
-}
 }
 

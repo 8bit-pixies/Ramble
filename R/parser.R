@@ -197,7 +197,7 @@ some <- function(p) {
 #' do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")
 #' do(x=item(), item, y=item(), f = function(x,y) {c(x,y)}) ("ab")
 do <- function(...) {
-  .Deprecated("the do function is to be removed since it is cumbersome and reduces readability")
+  .Deprecated("do function can be replicated with 'then' and 'using'")
   do <- list(...)
   return(function(string){
     doResult <- list()

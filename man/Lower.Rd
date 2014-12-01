@@ -9,8 +9,6 @@ Lower(...)
 Lower checks for single lower case character
 }
 \examples{
-\dontrun{
 Lower() ("abc")
-}
 }
 
