@@ -16,12 +16,6 @@ test_that("then", {
   expect_equal((item() %then% succeed("123") ) ("abc")$leftover, "bc")
 })
 
-test_that("do", {
-  expect_equal(do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")$result[1], "a")
-  expect_equal(do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")$result[2], "c")
-  expect_equal(do(x=item(), item(), y=item(), f = function(x,y) {c(x,y)}) ("abcdef")$leftover, "def")
-})
-
 test_that("alternation", {
   expect_equal((item() %alt% succeed("2")) ("abcdef")$result, "a")
   expect_equal((Digit() %alt% succeed("2")) ("abcdef")$result, "2")

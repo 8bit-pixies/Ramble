@@ -1,6 +1,3 @@
-#' @import R.utils
-NULL
-
 #' \code{succeed} is based on the empty string symbol in the BNF notation The 
 #' \code{succeed} parser always succeeds, without actually consuming any input 
 #' string. Since the outcome of succeed does not depend on its input, its result
