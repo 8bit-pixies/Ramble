@@ -65,11 +65,31 @@ literal <- function(char) {
 
 ## Building Combinators ##
 
+#' \code{alt} combinator is similar to alternation in BNF. the parser 
+#' \code{(alt(p1, p2))} recognises anything that \code{p1} or \code{p2} would. 
+#' The approach taken in this parser follows (Fairbairn86), in which either is 
+#' interpretted in a sequential (or exclusive) manner, returning the result of
+#' the first parser to succeed, and failure if neither does.
+alt <- function(p1, p2) {
+  return(function(string){
+    result <- p1 (string)
+    if(!is.null(result$leftover)) {return(result)}
+    else{
+      return(p2 (string))
+    }
+  })
+}
+
+#' \code{\%alt\%} is the infix notation for the \code{alt} function. 
+#' 
+#' @export
+#' @examples
+#' (item() %alt% succeed("2")) ("abcdef")
+`%alt%` <- alt
+
 #' \code{then} combinator corresponds to sequencing in BNF. The parser 
 #' \code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would 
-#' if placed in succession. In this manner, two results are produced for each
-#' successful parse, one from each parser. They are combined (by pairing) to
-#' form a single result for the compound parser.
+#' if placed in succession.
 then <- function(p1, p2) {
   return(function(string) {
     result <- p1 (string)
@@ -90,28 +110,6 @@ then <- function(p1, p2) {
 #' @examples
 #' (item() %then% succeed("123")) ("abc")
 `%then%` <- then
-
-#' \code{alt} combinator is similar to alternation in BNF. the parser 
-#' \code{(then(p1, p2))} recognises anything that \code{p1} or \code{p2} would. 
-#' The approach taken in this parser follows (Fairbairn86), in which either is 
-#' interpretted in a sequential (or exclusive) manner, returning the result of
-#' the first parser to succeed, and failure if neither does.
-alt <- function(p1, p2) {
-  return(function(string){
-    result <- p1 (string)
-    if(!is.null(result$leftover)) {return(result)}
-    else{
-      return(p2 (string))
-    }
-  })
-}
-
-#' \code{\%+++\%} is the infix notation for the \code{alt} function. 
-#' 
-#' @export
-#' @examples
-#' (item() %+++% succeed("2")) ("abcdef")
-`%alt%` <- alt
 
 #' \code{using} combinator allows us to manipulate results from a parser, for 
 #' example building a parse tree. The parser \code{(p \%using\% f)} has the same 

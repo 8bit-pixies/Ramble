@@ -10,36 +10,33 @@ expr <- ((term %then%
               print(unlist(c(x)))
               return(sum(as.numeric(unlist(c(x))[c(1,3)])))
             }) %alt% 
-           (term %then% 
-              symbol("-") %then%
-              expr %using% function(x) {
-                print(unlist(c(x)))
-                return(Reduce("-", as.numeric(unlist(c(x))[c(1,3)])))
-              }) %alt% term)
+          (term %then% 
+            symbol("-") %then%
+            expr %using% function(x) {
+              print(unlist(c(x)))
+              return(Reduce("-", as.numeric(unlist(c(x))[c(1,3)])))
+            }) %alt% term)
 
 
 term <- ((factor %then% 
-             symbol("*") %then%
-             term %using% function(x) {
-               print(unlist(c(x)))
-               return(prod(as.numeric(unlist(c(x))[c(1,3)])))
-             }) %alt% 
-           (factor %then% 
-              symbol("/") %then%
+            symbol("*") %then%
               term %using% function(x) {
                 print(unlist(c(x)))
-                return(Reduce("/", as.numeric(unlist(c(x))[c(1,3)])))
-              }) %alt% factor)
+                return(prod(as.numeric(unlist(c(x))[c(1,3)])))
+              }) %alt% 
+         (factor %then% 
+           symbol("/") %then%
+           term %using% function(x) {
+             print(unlist(c(x)))
+             return(Reduce("/", as.numeric(unlist(c(x))[c(1,3)])))
+          }) %alt% factor)
 
-factor <- ((
-    symbol("(") %then%
-      expr %then%
-      symbol(")") %using% 
-      function(x){
-        print(unlist(c(x)))
-        return(as.numeric(unlist(c(x))[2]))
-        })
-    %alt% natural())
+factor <- ((symbol("(") %then%
+            expr %then%
+            symbol(")") %using% function(x){
+              print(unlist(c(x)))
+              return(as.numeric(unlist(c(x))[2]))
+            }) %alt% natural())
 
 expr("1+2+3+4+5+6")
 expr("1+(2+3)*4+5+6")
