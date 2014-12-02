@@ -173,7 +173,7 @@ some <- function(p) {
   })
 }
 
-## Define the Generic Parsers ##
+## Define the derived primitives ##
 
 #' Digit checks for single digit
 #' 
@@ -211,13 +211,6 @@ Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x))
 #' AlphaNum()("abc123")
 AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
 
-#' char checks for a single character of your choice
-#' 
-#' @export
-#' @examples
-#' Char("a")("abc")
-Char <- function(c) {satisfy(function(x) {return(c==x)})}
-
 #' Space checks for a single space character
 #' 
 #' @export
@@ -225,13 +218,13 @@ Char <- function(c) {satisfy(function(x) {return(c==x)})}
 #' Space()(" 123")
 Space <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
 
-#' \code{string} is a combinator which allows us to build parsers whcih
+#' \code{string} is a combinator which allows us to build parsers which
 #' recognise strings of symbols, rather than just single symbols
 #' 
 #' @param string is the string to be matched
 #' @export
 #' @examples
-#' string("123")("123 abc")
+#' String("123")("123 abc")
 String <- function(string) {
   if (string=="") {
     return (succeed(NULL))
@@ -245,16 +238,17 @@ String <- function(string) {
   }
 }
 
-#' ident is identify, which is lowercase followed by zero or more alphanumeric
-#' ident || Parser String
+#' \code{ident} is a parser which matches zero or more alphanumeric
+#' characters. 
+#' 
 #' @export
 #' @examples
 #' ident() ("variable1 = 123")
 ident <- function() {(many(AlphaNum()) %using%
             function(x) paste0(unlist(c(x)), collapse=""))}
 
-#' nat matches natural numbers
-#' nat || Parser Int
+#' \code{nat} is a parser which matches one or more numeric characters.
+#' 
 #' @export
 #' @examples
 #' nat() ("123 + 456")
@@ -263,8 +257,8 @@ nat <- function() {
     function(x) {paste(unlist(c(x)), collapse="")}
 }
 
-#' space matches spaces
-#' space || Parser ()
+#' \code{space} matches zero or more space characters.
+#' 
 #' @export
 #' @examples
 #' space() ("  abc")
@@ -273,8 +267,10 @@ space <- function() {
     function(x) {return("")}
 }
 
-#' token strips spaces as needed
-#' token || Parser a -> Parser a
+#' \code{token} is a new primitive that ignores any space before and after
+#' applying a parser to a token.
+#' 
+#' @param p is the parser to have spaces stripped.
 #' @export
 #' @examples
 #' token(ident()) ("   variable1   ")
@@ -285,18 +281,19 @@ token <- function(p) {
     function(x) {return(unlist(c(x))[2])}
 }
 
-#' identifier creates an identifier
+#' \code{identifier} creates an identifier
 #' 
 #' @export
 identifier <- function(...) {token(ident())}
 
+#' \code{natural} creates a token parser for natural numbers
+#' 
 #' @export
 natural <- function(...) {token(nat())}
 
-#' Symbol creates a token for a symbol
+#' \code{symbol} creates a token for a symbol
+#' 
 #' @export
 #' @examples
-#' \dontrun{
 #' symbol("[") ("  [123]")
-#' }
 symbol <- function(xs) {token(String(xs))}

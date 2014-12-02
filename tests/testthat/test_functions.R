@@ -1,11 +1,11 @@
 library(Ramble)
 
-test_that("returns", {
+test_that("succeed", {
   expect_equal(succeed("1") ("abc")$result, "1")
   expect_equal(succeed("1") ("abc")$leftover, "abc")
 })
 
-test_that("items", {
+test_that("item", {
   expect_equal(item() ("abc")$result, "a")
   expect_equal(item() ("abc")$leftover, "bc")
 })

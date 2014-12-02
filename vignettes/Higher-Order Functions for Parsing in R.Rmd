@@ -193,6 +193,140 @@ some <- function(p) {
 some(literal("a"))("aaabbc")
 ```
 
-Note that (`some p`) may fail, whereas (`many p`) always succeeds. Using `some` we define parsers for number and words, which are non-empty sequences of digits and letters:
+Note that (`some p`) may fail, whereas (`many p`) always succeeds. 
+
+## Derived Primitives
+
+Using the basic parsers together with sequencing and choice, we can now define a number of other useful parsing primitives. 
+
+Firstly using `satisfy` with the appropriate predicates, we can define parsers for single digits, lower-case letters, upper-case letters, arbitrary letters, alphanumeric characters, and specific characters. We have already demonstrated how we can parser specific characters (see `literal`), but the others can be defined in a similar way:
+
+```{r, derived}
+Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
+Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))})}
+Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
+Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
+Space <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
+```
+
+In a similar many we can define a parser `String` for the string of characters, with the string itself returned as the result value:
+
+```{r, String}
+String <- function(string) {
+  if (string=="") {
+    return (succeed(NULL))
+  }
+  else {
+    result_=substr(string, 1, 1)
+    leftover_=substring(string, 2)
+    return((literal(result_) %then% 
+            String(leftover_)) %using% 
+             function(x) {paste(unlist(c(x)), collapse="")})
+  }
+}
+String("123")("123 abc")
+```
+
+Note that `String` is defined using recursion, and only succeeds if the entire target string is consumed. The base case states that the empty string is always parsed. The recursive case states that a non-empty string can be parsed by parsing the first character, parsing the remaining characters, and returning the entire string as the result value.
+
+Similarly we can create parsers to match identifiers (`ident`), natural numbers (`nat`), spaces (`space`):
+
+```{r, ident}
+ident <- function() {(many(AlphaNum()) %using%
+          function(x) paste0(unlist(c(x)), collapse=""))}
+nat <- function() {
+  some(Digit()) %using%
+  function(x) {paste(unlist(c(x)), collapse="")}
+}
+space <- function() {
+  many(Space()) %using%
+  function(x) {return("")}
+}
+ident() ("var1 = 123")
+nat() ("123456")
+```
+
+## Handling spacing
+
+To handle spaces we will define a new primitive `token` which ignores any space before and after applying a parser for a token:
+
+```{r, token}
+token <- function(p) {
+  space() %then%
+    p %then%
+    space() %using%
+    function(x) {return(unlist(c(x))[2])}
+}
+token(ident()) ("   var1   ")
+```
+This can then be expanded for identifiers, natural numbers and symbols:
+
+```{r, identifier}
+identifier <- function(...) {token(ident())}
+natural <- function(...) {token(nat())}
+symbol <- function(xs) {token(String(xs))}
+identifier() ("   var1   ")
+```
+
+# Example
+
+To conclude our introduction to combinator parsing, we will work through the derivation of a simple parser. Suppose we have a program which works with arithmetic expressions, defined as follows:
+
+```
+Example with expressions, will not be exported
+expression example
+expr :: = term + term | term - term | term
+term :: = factor * factor | factor / factor | factor
+factor :: = (expr) | digit+
+```
+
+Having this structure allows multiplication and divsion to have higher precedence than addition and subtraction. We can simply rewrite the BNF grammar above as follows:
+
+```{r, arith}
+expr <- ((term %then% 
+            symbol("+") %then%
+            expr %using% function(x) {
+              print(unlist(c(x)))
+              return(sum(as.numeric(unlist(c(x))[c(1,3)])))
+            }) %alt% 
+          (term %then% 
+            symbol("-") %then%
+            expr %using% function(x) {
+              print(unlist(c(x)))
+              return(Reduce("-", as.numeric(unlist(c(x))[c(1,3)])))
+            }) %alt% term)
+
+
+term <- ((factor %then% 
+            symbol("*") %then%
+              term %using% function(x) {
+                print(unlist(c(x)))
+                return(prod(as.numeric(unlist(c(x))[c(1,3)])))
+              }) %alt% 
+         (factor %then% 
+           symbol("/") %then%
+           term %using% function(x) {
+             print(unlist(c(x)))
+             return(Reduce("/", as.numeric(unlist(c(x))[c(1,3)])))
+          }) %alt% factor)
+
+factor <- ((symbol("(") %then%
+            expr %then%
+            symbol(")") %using% function(x){
+              print(unlist(c(x)))
+              return(as.numeric(unlist(c(x))[2]))
+            }) %alt% natural())
+```
+
+This will evaluate the arithmetic expressions:
+
+```{r, exp}
+expr("2+(4-1)*3")
+```
+
+
+
+
 
 
