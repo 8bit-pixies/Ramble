@@ -3,7 +3,7 @@
 #' Unlist is the same as unlist, but doesn't recurses all the way to
 #' preserve the type. This function is not well optimised.
 #' 
-#' @param a.list is a list to flatten
+#' @param a.list is a list to be flatten
 Unlist <- function(a.list) {
   hasLowerLevel = TRUE
   while(hasLowerLevel) {

@@ -30,12 +30,15 @@
 #' for the purposes of this example, all the assignments will be of the form
 #' `assign(x, value, env=PL0)`, this will then assign the variable to 
 #' PL0 environment, which we will define.
+#' 
+#' Currently this implementation is incomplete, as it is missing block and while grammar and logic
 
 PL0 <- new.env()
 
 # statement("if 1 > 2 then var1 := 3")
 # statement("test := 1+2+3")
 # statement("call test")
+# invisible(statement("begin x := 1; x := x + 1; ! x end"))
 statement <- (((identifier() %then% token(String(":=")) %then% expr)
                %using% function(stateVar) {
                  if (stateVar[[2]] == ":=") {
@@ -44,13 +47,12 @@ statement <- (((identifier() %then% token(String(":=")) %then% expr)
                  return(stateVar)
                })
             %alt% (symbol("!") %then% identifier() 
-                   %using% function(stateVar) {
-                     # this calls a defined function (procedure)
-                     print(get(stateVar[[2]], envir = PL0))
-                     return(stateVar)
-                   })
-
-             %alt% (token(String("if")) %then% condition %then% token(String("then")) 
+                    %using% function(stateVar) {
+                      # this calls a defined function (procedure)
+                      print(get(stateVar[[2]], envir = PL0))
+                      return(stateVar)
+                    })
+            %alt% (token(String("if")) %then% condition %then% token(String("then")) 
                     %then% statement %using% function(x) {
                       if(x[[2]]) {
                         return(x[[4]])
@@ -59,11 +61,10 @@ statement <- (((identifier() %then% token(String(":=")) %then% expr)
                         return(x)
                       }
                     })
-             %alt% (token(String("while")) %then% condition %then% token(String("do")) 
-                    %then% statement)
-             %alt% (token(String("begin")) %then% ((statement %then% symbol(";") %then% statement) %alt% statement)
+             %alt% (token(String("begin")) %then% (statement %then% many(symbol(";") %then% statement))
                     %then% token(String("end")))
              %alt% (token(String("call")) %then% identifier())
+             # while loop not implemented
             )
 
 condition <- (expr %then% (token(String("<="))
@@ -72,28 +73,25 @@ condition <- (expr %then% (token(String("<="))
                            %alt% symbol("<")
                            %alt% symbol(">")) 
                    %then% expr
-                   %using% function(x) {
-                     print(unlist(c(x)))
-                     #' try to return a boolean otherwise return unlist vector
-                     bool <- unlist(c(x))                     
-                     if (bool[2] == "<") {
-                       try(bool1 <- as.numeric(bool[1]) < as.numeric(bool[3]), silent=TRUE)
+                   %using% function(bool) {
+                     if (bool[[2]] == "<") {
+                       try(bool1 <- as.numeric(bool[[1]]) < as.numeric(bool[3]), silent=TRUE)
                        return(if (is.na(bool1)) bool else bool1)
                      }
-                     else if (bool[2] == ">") {
-                       try(bool1 <- as.numeric(bool[1]) > as.numeric(bool[3]), silent=TRUE)
+                     else if (bool[[2]] == ">") {
+                       try(bool1 <- as.numeric(bool[[1]]) > as.numeric(bool[3]), silent=TRUE)
                        return(if (is.na(bool1)) bool else bool1)
                      }
-                     else if (bool[2] == "=") {
-                       try(bool1 <- as.numeric(bool[1]) == as.numeric(bool[3]), silent=TRUE)
+                     else if (bool[[2]] == "=") {
+                       try(bool1 <- as.numeric(bool[[1]]) == as.numeric(bool[3]), silent=TRUE)
                        return(if (is.na(bool1)) bool else bool1)
                      }
-                     else if (bool[2] == "<=") {
-                       try(bool1 <- as.numeric(bool[1]) <= as.numeric(bool[3]), silent=TRUE)
+                     else if (bool[[2]] == "<=") {
+                       try(bool1 <- as.numeric(bool[[1]]) <= as.numeric(bool[3]), silent=TRUE)
                        return(if (is.na(bool1)) bool else bool1)
                      }
-                     else if (bool[2] == ">=") {
-                       try(bool1 <- as.numeric(bool[1]) >= as.numeric(bool[3]), silent=TRUE)
+                     else if (bool[[2]] == ">=") {
+                       try(bool1 <- as.numeric(bool[[1]]) >= as.numeric(bool[3]), silent=TRUE)
                        return(if (is.na(bool1)) bool else bool1)
                      }
                      else {
@@ -136,6 +134,8 @@ factor <- ((symbol("(") %then%
               }) %alt% (natural() %using% function(x) {
                 as.numeric(x)
               })
-                 %alt% identifier())
-
+                 %alt% (identifier() %using% function(x) {
+                   # try to get the value from environment
+                   get(x[[1]], envir = PL0)
+                 }))
 

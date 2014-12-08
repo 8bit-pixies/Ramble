@@ -3,17 +3,13 @@
 \alias{then}
 \title{\code{then} combinator corresponds to sequencing in BNF. The parser
 \code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would
-if placed in succession. In this manner, two results are produced for each
-successful parse, one from each parser. They are combined (by pairing) to
-form a single result for the compound parser.}
+if placed in succession.}
 \usage{
 then(p1, p2)
 }
 \description{
 \code{then} combinator corresponds to sequencing in BNF. The parser
 \code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would
-if placed in succession. In this manner, two results are produced for each
-successful parse, one from each parser. They are combined (by pairing) to
-form a single result for the compound parser.
+if placed in succession.
 }
 

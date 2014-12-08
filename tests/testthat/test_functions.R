@@ -22,7 +22,7 @@ test_that("alternation", {
 })
 
 test_that("many", {
-  expect_equal(length(many(Digit()) ("123abc")$result), 3)
+  expect_equal(length(unlist(many(Digit()) ("123abc")$result)), 3)
   expect_equal(many(Digit()) ("123abc")$leftover, "abc")
 })
 
