@@ -99,7 +99,7 @@ then <- function(p1, p2) {
     else {
       result_ <- p2 (result$leftover)
       if (length(result_$leftover) == 0 || is.null(result_$leftover)) {return(list())}
-      return(list(result=append(list(result$result), result_$result), leftover=result_$leftover))
+      return(list(result=Unlist(append(list(result$result), list(result_$result))), leftover=result_$leftover))
     }
   })
 }
