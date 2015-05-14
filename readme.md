@@ -14,6 +14,11 @@ Python's [recursive descent parsing library](https://pypi.python.org/pypi/funcpa
 
 *  [Higher-order functions for parsing](http://eprints.nottingham.ac.uk/221/1/parsing.pdf)
 
+How it Works
+============
+
+To understand the differences between Ramble and other combinatory parsers please read [Ramble: A Parser Combinator](http://www.slideshare.net/chapm0nsiu/ramble-introduction).
+
 Example
 =======
 
