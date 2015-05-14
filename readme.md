@@ -17,7 +17,7 @@ Python's [recursive descent parsing library](https://pypi.python.org/pypi/funcpa
 How it Works
 ============
 
-To understand the differences between Ramble and other combinatory parsers please read [Ramble: A Parser Combinator](http://www.slideshare.net/chapm0nsiu/ramble-introduction).
+To understand the differences between Ramble and other combinatory parsers please read [Ramble: A Parser Combinator in R](http://www.slideshare.net/chapm0nsiu/ramble-introduction).
 
 Example
 =======
