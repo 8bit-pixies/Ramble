@@ -1,11 +1,11 @@
 Package: Ramble
 Type: Package
-Title: Parser Generator for R
+Title: Parser Combinator for R
 Version: 0.1.0
 Date: 2014-11-28
 Author: Chapman Siu
-Maintainer: Chapman Siu <chapm0n.siu@gmail.com>
-Description: A parser generator for R using combinatory parsers. It
+Maintainer: Chapman Siu <chpmn.siu@gmail.com>
+Description: Parser generator for R using combinatory parsers. It
     is inspired by combinatory parsers developed in Haskell.
 License: MIT + file LICENSE
 Imports:
