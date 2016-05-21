@@ -9,5 +9,11 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
+Notes include "possible mis-spelled words", which were spelt correctly:
+*  Haskell (9:53)
+*  combinatory (8:45, 9:20)
+*  parsers (8:57, 9:32)
+
+
 ## Downstream dependencies
 *  Did not check downstream dependencies
