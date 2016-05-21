@@ -2,6 +2,18 @@
 
 This project is just an example to examine the functional components of R. 
 
+Installation
+============
+
+Ramble is now on CRAN:
+
+    install.packages("Ramble")
+    
+The development version can be installed from github:
+
+    # install.packages("devtools")
+    devtools::install_github("chappers/Ramble")
+
 Goals
 =====
 
