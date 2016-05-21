@@ -1,3 +1,5 @@
+[![Travis-CI Build Status](https://travis-ci.org/chappers/Ramble.svg?branch=master)](https://travis-ci.org/chappers/Ramble)
+
 This project is just an example to examine the functional components of R. 
 
 Goals

@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 example.*?.R
 readme.md
+^\.travis\.yml$
