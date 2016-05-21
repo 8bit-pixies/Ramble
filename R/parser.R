@@ -17,6 +17,7 @@ succeed <- function(string) {
 #' returns the rest. If it cannot consume a single character from the string, it
 #' will emit the empty list, indicating the parser has failed.
 #' 
+#' @param ... additional arguments for the parser
 #' @export
 #' @examples
 #' item() ("abc")
@@ -70,6 +71,10 @@ literal <- function(char) {
 #' The approach taken in this parser follows (Fairbairn86), in which either is 
 #' interpretted in a sequential (or exclusive) manner, returning the result of
 #' the first parser to succeed, and failure if neither does.
+#' 
+#' @param p1 the first parser
+#' @param p2 the second parser 
+#' @return Returns the first parser if it suceeds otherwise the second parser
 alt <- function(p1, p2) {
   return(function(string){
     result <- p1 (string)
@@ -82,6 +87,9 @@ alt <- function(p1, p2) {
 
 #' \code{\%alt\%} is the infix notation for the \code{alt} function. 
 #' 
+#' @param p1 the first parser
+#' @param p2 the second parser 
+#' @return Returns the first parser if it suceeds otherwise the second parser
 #' @export
 #' @examples
 #' (item() %alt% succeed("2")) ("abcdef")
@@ -90,6 +98,10 @@ alt <- function(p1, p2) {
 #' \code{then} combinator corresponds to sequencing in BNF. The parser 
 #' \code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would 
 #' if placed in succession.
+#' 
+#' @param p1 the first parser
+#' @param p2 the second parser 
+#' @return recognises anything that \code{p1} and \code{p2} would if placed in succession.
 then <- function(p1, p2) {
   return(function(string) {
     result <- p1 (string)
@@ -106,6 +118,9 @@ then <- function(p1, p2) {
 
 #' \code{\%then\%} is the infix operator for the then combinator.
 #' 
+#' @param p1 the first parser
+#' @param p2 the second parser 
+#' @return recognises anything that \code{p1} and \code{p2} would if placed in succession.
 #' @export
 #' @examples
 #' (item() %then% succeed("123")) ("abc")
@@ -118,6 +133,7 @@ then <- function(p1, p2) {
 #' 
 #' @param p is the parser to be applied
 #' @param f is the function to be applied to each result of \code{p}.
+#' @return The parser \code{(p \%using\% f)} has the same behaviour as the parser \code{p}, except that the function \code{f} is applied to each of its result values.
 using <- function(p, f) {
   return(function(string) {
     result <- p (string) 
@@ -129,6 +145,8 @@ using <- function(p, f) {
 
 #' \code{\%using\%} is the infix operator for using
 #' 
+#' @param p is the parser to be applied
+#' @param f is the function to be applied to each result of \code{p}.
 #' @export
 #' @examples
 #' (item() %using% as.numeric) ("1abc")
@@ -177,6 +195,7 @@ some <- function(p) {
 
 #' Digit checks for single digit
 #' 
+#' @param ... additional arguments for the primitives to be parsed
 #' @export
 #' @examples
 #' Digit()("123")
@@ -184,6 +203,7 @@ Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))}
 
 #' Lower checks for single lower case character
 #' 
+#' @param ... additional arguments for the primitives to be parsed
 #' @export
 #' @examples
 #' Lower() ("abc")
@@ -191,6 +211,7 @@ Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))}
 
 #' Upper checks for a single upper case character
 #' 
+#' @param ... additional arguments for the primitives to be parsed
 #' @export
 #' @examples
 #' Upper()("Abc")
@@ -198,6 +219,7 @@ Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
 
 #' Alpha checks for single alphabet character
 #' 
+#' @param ... additional arguments for the primitives to be parsed
 #' @export
 #' @examples
 #' Alpha()("abc")
@@ -205,18 +227,20 @@ Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x))
 
 #' AlphaNum checks for a single alphanumeric character
 #' 
+#' @param ... additional arguments for the primitives to be parsed
 #' @export
 #' @examples
 #' AlphaNum()("123")
 #' AlphaNum()("abc123")
 AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
 
-#' Space checks for a single space character
+#' SpaceCheck checks for a single space character
 #' 
+#' @param ... additional arguments for the primitives to be parsed
 #' @export
 #' @examples
-#' Space()(" 123")
-Space <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
+#' SpaceCheck()(" 123")
+SpaceCheck <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
 
 #' \code{string} is a combinator which allows us to build parsers which
 #' recognise strings of symbols, rather than just single symbols
@@ -263,7 +287,7 @@ nat <- function() {
 #' @examples
 #' space() ("  abc")
 space <- function() {
-  many(Space()) %using%
+  many(SpaceCheck()) %using%
     function(x) {return("")}
 }
 
@@ -283,16 +307,19 @@ token <- function(p) {
 
 #' \code{identifier} creates an identifier
 #' 
+#' @param ... takes in token primitives
 #' @export
 identifier <- function(...) {token(ident())}
 
 #' \code{natural} creates a token parser for natural numbers
 #' 
+#' @param ... additional arguments for the parser
 #' @export
 natural <- function(...) {token(nat())}
 
 #' \code{symbol} creates a token for a symbol
 #' 
+#' @param xs takes in a string to create a token
 #' @export
 #' @examples
 #' symbol("[") ("  [123]")

@@ -8,8 +8,11 @@ Maintainer: Chapman Siu <chapm0n.siu@gmail.com>
 Description: A parser generator for R using combinatory parsers. It
     is inspired by combinatory parsers developed in Haskell.
 License: MIT + file LICENSE
+Imports:
+    methods
 Suggests:
     testthat,
     knitr
 VignetteBuilder: knitr
 LazyData: true
+RoxygenNote: 5.0.1

@@ -207,7 +207,7 @@ Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))}
 Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
 Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
 AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
-Space <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
+SpaceCheck <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
 ```
 
 In a similar many we can define a parser `String` for the string of characters, with the string itself returned as the result value:
@@ -240,7 +240,7 @@ nat <- function() {
   function(x) {paste(unlist(c(x)), collapse="")}
 }
 space <- function() {
-  many(Space()) %using%
+  many(SpaceCheck()) %using%
   function(x) {return("")}
 }
 ident() ("var1 = 123")
