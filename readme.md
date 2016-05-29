@@ -1,4 +1,9 @@
+Ramble
+======
+
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/Ramble)](http://cran.r-project.org/package=Ramble)
 [![Travis-CI Build Status](https://travis-ci.org/chappers/Ramble.svg?branch=master)](https://travis-ci.org/chappers/Ramble)
+[![Coverage Status](http://codecov.io/github/chappers/Ramble/coverage.svg?branch=master)](http://codecov.io/github/chappers/Ramble?branch=master)
 
 This project is just an example to examine the functional components of R. 
 
