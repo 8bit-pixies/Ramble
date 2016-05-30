@@ -3,7 +3,7 @@
 #' 
 #' @param a.list is a list to be flatten
 #' @importFrom methods is
-Unlist <- function(a.list) {
+Unlist <- function(a.list) { #nocov start
   hasLowerLevel = TRUE
   while(hasLowerLevel) {
     a.list1 <- unlist(a.list, recursive=FALSE, use.names=FALSE)
@@ -17,4 +17,4 @@ Unlist <- function(a.list) {
   }
   warning("loop should have returned a list!")
   return(a.list)
-}
+} #nocov end
