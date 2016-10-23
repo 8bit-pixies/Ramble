@@ -15,12 +15,15 @@ using(p, f)
 \item{f}{is the function to be applied to each result of \code{p}.}
 }
 \value{
-The parser \code{(p \%using\% f)} has the same behaviour as the parser \code{p}, except that the function \code{f} is applied to each of its result values.
+The parser \code{(p \%using\% f)} has the same behaviour as the
+  parser \code{p}, except that the function \code{f} is applied to each of
+  its result values.
 }
 \description{
-\code{using} combinator allows us to manipulate results from a parser, for 
-example building a parse tree. The parser \code{(p \%using\% f)} has the same 
-behaviour as the parser \code{p}, except that the function \code{f} is
-applied to each of its result values.
+\code{\%using\%} is the infix operator for \code{using}, and it is the
+preferred way to use the \code{using} operator.
+}
+\examples{
+(item() \%using\% as.numeric) ("1abc")
 }
 

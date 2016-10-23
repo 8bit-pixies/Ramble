@@ -72,9 +72,15 @@ literal <- function(char) {
 #' interpretted in a sequential (or exclusive) manner, returning the result of
 #' the first parser to succeed, and failure if neither does.
 #' 
+#' \code{\%alt\%} is the infix notation for the \code{alt} function, and it is the
+#' preferred way to use the \code{alt} operator.
+#' 
 #' @param p1 the first parser
-#' @param p2 the second parser 
+#' @param p2 the second parser
 #' @return Returns the first parser if it suceeds otherwise the second parser
+#' @examples
+#' (item() %alt% succeed("2")) ("abcdef")
+#' @seealso \code{\link{then}}
 alt <- function(p1, p2) {
   return(function(string){
     result <- p1 (string)
@@ -85,23 +91,23 @@ alt <- function(p1, p2) {
   })
 }
 
-#' \code{\%alt\%} is the infix notation for the \code{alt} function. 
-#' 
-#' @param p1 the first parser
-#' @param p2 the second parser 
-#' @return Returns the first parser if it suceeds otherwise the second parser
 #' @export
-#' @examples
-#' (item() %alt% succeed("2")) ("abcdef")
 `%alt%` <- alt
 
 #' \code{then} combinator corresponds to sequencing in BNF. The parser 
 #' \code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would 
 #' if placed in succession.
 #' 
+#' \code{\%then\%} is the infix operator for the then combinator, and it is the
+#' preferred way to use the \code{then} operator.
+#' 
 #' @param p1 the first parser
-#' @param p2 the second parser 
-#' @return recognises anything that \code{p1} and \code{p2} would if placed in succession.
+#' @param p2 the second parser
+#' @return recognises anything that \code{p1} and \code{p2} would if placed in 
+#'   succession.
+#' @examples
+#' (item() %then% succeed("123")) ("abc")
+#' @seealso \code{\link{alt}}
 then <- function(p1, p2) {
   return(function(string) {
     result <- p1 (string)
@@ -110,20 +116,18 @@ then <- function(p1, p2) {
     }
     else {
       result_ <- p2 (result$leftover)
-      if (length(result_$leftover) == 0 || is.null(result_$leftover)) {return(list())}
-      return(list(result=Unlist(append(list(result$result), list(result_$result))), leftover=result_$leftover))
+      if (length(result_$leftover) == 0 ||
+          is.null(result_$leftover)) {
+        return(list())
+      }
+      return(list(result=Unlist(append(list(result$result),
+                                       list(result_$result))),
+                  leftover=result_$leftover))
     }
   })
 }
 
-#' \code{\%then\%} is the infix operator for the then combinator.
-#' 
-#' @param p1 the first parser
-#' @param p2 the second parser 
-#' @return recognises anything that \code{p1} and \code{p2} would if placed in succession.
 #' @export
-#' @examples
-#' (item() %then% succeed("123")) ("abc")
 `%then%` <- then
 
 #' \code{using} combinator allows us to manipulate results from a parser, for 
@@ -131,9 +135,16 @@ then <- function(p1, p2) {
 #' behaviour as the parser \code{p}, except that the function \code{f} is
 #' applied to each of its result values.
 #' 
+#' \code{\%using\%} is the infix operator for \code{using}, and it is the
+#' preferred way to use the \code{using} operator.
+#' 
 #' @param p is the parser to be applied
 #' @param f is the function to be applied to each result of \code{p}.
-#' @return The parser \code{(p \%using\% f)} has the same behaviour as the parser \code{p}, except that the function \code{f} is applied to each of its result values.
+#' @return The parser \code{(p \%using\% f)} has the same behaviour as the
+#'   parser \code{p}, except that the function \code{f} is applied to each of
+#'   its result values.
+#' @examples
+#' (item() %using% as.numeric) ("1abc")
 using <- function(p, f) {
   return(function(string) {
     result <- p (string) 
@@ -143,13 +154,7 @@ using <- function(p, f) {
   })
 }
 
-#' \code{\%using\%} is the infix operator for using
-#' 
-#' @param p is the parser to be applied
-#' @param f is the function to be applied to each result of \code{p}.
 #' @export
-#' @examples
-#' (item() %using% as.numeric) ("1abc")
 `%using%` <- using
 
 #' \code{many} matches 0 or more of pattern \code{p}. In BNF notation, 
@@ -163,12 +168,13 @@ using <- function(p, f) {
 #' tuples, we must revert to using a list rather than a vector, since all values
 #' in an R vector must be the same datatype.
 #' 
-#' @param p is the parser to matched 0 or more times.
+#' @param p is the parser to match 0 or more times.
 #' @export
 #' @examples
 #' Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 #' many(Digit()) ("123abc")
 #' many(Digit()) ("abc")
+#' @seealso \code{\link{some}}
 many <- function(p) {
   return(function(string) {
     ((p %then% many(p)) %alt% succeed(NULL)) (string)
@@ -180,11 +186,12 @@ many <- function(p) {
 #' \code{p+}. The \code{some} combinator corresponds directly to this operator,
 #' and is defined in much the same way.
 #' 
-#' @param p is the parser to matched 1 or more times.
+#' @param p is the parser to match 1 or more times.
 #' @export
 #' @examples
 #' Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 #' some(Digit()) ("123abc")
+#' @seealso \code{\link{many}}
 some <- function(p) {
   return(function(string){
     (p %then% many(p)) (string)
@@ -199,7 +206,14 @@ some <- function(p) {
 #' @export
 #' @examples
 #' Digit()("123")
-Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
+#' @seealso \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+Digit <- function(...) {
+  satisfy(function(x) {return(!!length(grep("[0-9]", x)))})
+}
 
 #' Lower checks for single lower case character
 #' 
@@ -207,6 +221,11 @@ Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))}
 #' @export
 #' @examples
 #' Lower() ("abc")
+#' @seealso \code{\link{Digit}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
 Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))})}
 
 #' Upper checks for a single upper case character
@@ -215,7 +234,14 @@ Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))}
 #' @export
 #' @examples
 #' Upper()("Abc")
-Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+Upper <- function(...) {
+  satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
+}
 
 #' Alpha checks for single alphabet character
 #' 
@@ -223,7 +249,14 @@ Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
 #' @export
 #' @examples
 #' Alpha()("abc")
-Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+Alpha <- function(...) {
+  satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+}
 
 #' AlphaNum checks for a single alphanumeric character
 #' 
@@ -232,7 +265,14 @@ Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x))
 #' @examples
 #' AlphaNum()("123")
 #' AlphaNum()("abc123")
-AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+AlphaNum <- function(...) {
+  satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
+}
 
 #' SpaceCheck checks for a single space character
 #' 
@@ -240,15 +280,27 @@ AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]
 #' @export
 #' @examples
 #' SpaceCheck()(" 123")
-SpaceCheck <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}},
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+SpaceCheck <- function(...) {
+  satisfy(function(x) {return(!!length(grep("\\s", x)))})
+}
 
-#' \code{string} is a combinator which allows us to build parsers which
+#' \code{String} is a combinator which allows us to build parsers which
 #' recognise strings of symbols, rather than just single symbols
 #' 
 #' @param string is the string to be matched
 #' @export
 #' @examples
 #' String("123")("123 abc")
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
 String <- function(string) {
   if (string=="") {
     return (succeed(NULL))
@@ -268,14 +320,26 @@ String <- function(string) {
 #' @export
 #' @examples
 #' ident() ("variable1 = 123")
-ident <- function() {(many(AlphaNum()) %using%
-            function(x) paste0(unlist(c(x)), collapse=""))}
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+ident <- function() {
+  (many(AlphaNum()) %using%
+     function(x) paste0(unlist(c(x)), collapse=""))
+}
 
 #' \code{nat} is a parser which matches one or more numeric characters.
 #' 
 #' @export
 #' @examples
 #' nat() ("123 + 456")
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}},
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
 nat <- function() {
   some(Digit()) %using%
     function(x) {paste(unlist(c(x)), collapse="")}
@@ -286,6 +350,11 @@ nat <- function() {
 #' @export
 #' @examples
 #' space() ("  abc")
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
 space <- function() {
   many(SpaceCheck()) %using%
     function(x) {return("")}
@@ -298,6 +367,11 @@ space <- function() {
 #' @export
 #' @examples
 #' token(ident()) ("   variable1   ")
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{identifier}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
 token <- function(p) {
   space() %then%
     p %then%
@@ -309,13 +383,27 @@ token <- function(p) {
 #' 
 #' @param ... takes in token primitives
 #' @export
-identifier <- function(...) {token(ident())}
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}},
+#'   \code{\link{natural}}, \code{\link{symbol}}
+identifier <- function(...) {
+  token(ident())
+}
 
 #' \code{natural} creates a token parser for natural numbers
 #' 
 #' @param ... additional arguments for the parser
 #' @export
-natural <- function(...) {token(nat())}
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{symbol}}
+natural <- function(...) {
+  token(nat())
+}
 
 #' \code{symbol} creates a token for a symbol
 #' 
@@ -323,4 +411,9 @@ natural <- function(...) {token(nat())}
 #' @export
 #' @examples
 #' symbol("[") ("  [123]")
+#' @seealso \code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+#'   \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+#'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+#'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+#'   \code{\link{natural}}
 symbol <- function(xs) {token(String(xs))}

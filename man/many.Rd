@@ -11,7 +11,7 @@ and is defined in much the same way.}
 many(p)
 }
 \arguments{
-\item{p}{is the parser to matched 0 or more times.}
+\item{p}{is the parser to match 0 or more times.}
 }
 \description{
 This implementation of \code{many} differs from (Hutton92) due to the nature 
@@ -23,5 +23,8 @@ in an R vector must be the same datatype.
 Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 many(Digit()) ("123abc")
 many(Digit()) ("abc")
+}
+\seealso{
+\code{\link{some}}
 }
 

@@ -15,4 +15,11 @@ SpaceCheck checks for a single space character
 \examples{
 SpaceCheck()(" 123")
 }
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+  \code{\link{Alpha}}, \code{\link{AlphaNum}},
+  \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+  \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+  \code{\link{natural}}, \code{\link{symbol}}
+}
 

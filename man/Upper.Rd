@@ -15,4 +15,11 @@ Upper checks for a single upper case character
 \examples{
 Upper()("Abc")
 }
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, 
+  \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+  \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+  \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+  \code{\link{natural}}, \code{\link{symbol}}
+}
 
