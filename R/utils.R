@@ -1,17 +1,16 @@
-#' Unlist is the same as unlist, but doesn't recurses all the way to
+#' Unlist is the same as unlist, but doesn't recurse all the way to
 #' preserve the type. This function is not well optimised.
 #' 
 #' @param a.list is a list to be flatten
 #' @importFrom methods is
 Unlist <- function(a.list) { #nocov start
-  hasLowerLevel = TRUE
-  while(hasLowerLevel) {
+  hasLowerLevel <- TRUE
+  while (hasLowerLevel) {
     a.list1 <- unlist(a.list, recursive=FALSE, use.names=FALSE)
     if (is(a.list1, 'list')) {
       a.list <- a.list1
-    }
-    else {
-      hasLowerLevel = FALSE
+    } else {
+      hasLowerLevel <- FALSE
       return(a.list)
     }
   }

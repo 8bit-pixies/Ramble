@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{Unlist}
 \alias{Unlist}
-\title{Unlist is the same as unlist, but doesn't recurses all the way to
+\title{Unlist is the same as unlist, but doesn't recurse all the way to
 preserve the type. This function is not well optimised.}
 \usage{
 Unlist(a.list)
@@ -11,7 +11,7 @@ Unlist(a.list)
 \item{a.list}{is a list to be flatten}
 }
 \description{
-Unlist is the same as unlist, but doesn't recurses all the way to
+Unlist is the same as unlist, but doesn't recurse all the way to
 preserve the type. This function is not well optimised.
 }
 

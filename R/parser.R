@@ -9,7 +9,8 @@
 #' succeed("1") ("abc")
 succeed <- function(string) {
   return(function(nextString) {
-    return(list(result = string, leftover=nextString))
+    list(result=string,
+         leftover=nextString)
   })
 }
 
@@ -24,8 +25,15 @@ succeed <- function(string) {
 #' item() ("")
 item <- function(...){
   return(function(string){
-    if(length(string)==0){return(NULL)}
-    return (if(string=="") list() else list(result=substr(string, 1, 1), leftover=substring(string, 2)))
+    if(length(string)==0){
+      return(NULL)
+    }
+    if(string=="") {
+      list()
+    } else {
+      list(result=substr(string, 1, 1),
+           leftover=substring(string, 2))
+    }
   })
 }
 
@@ -35,18 +43,18 @@ item <- function(...){
 #' @export
 satisfy <- function(p) {
   return(function(string) {
-    if (length(string)==0) {
+    if (length(string) == 0) {
       return(list())
     }
-    else if (string==""){
+    else if (string == "") {
       return(list())
     }
     else {
-      result_ = list(result=substr(string, 1, 1), leftover=substring(string, 2))
+      result_ <- list(result=substr(string, 1, 1),
+                      leftover=substring(string, 2))
       if (p(result_$result)) {
         return(succeed(result_$result)(result_$leftover))
-      }
-      else{
+      } else {
         return(list())
       }
     }    
@@ -61,7 +69,9 @@ satisfy <- function(p) {
 #' @examples
 #' literal("a") ("abc")
 literal <- function(char) {
-  satisfy(function(x){return(x==char)})
+  satisfy(function(x){
+    return(x==char)
+  })
 }
 
 ## Building Combinators ##
@@ -82,13 +92,14 @@ literal <- function(char) {
 #' (item() %alt% succeed("2")) ("abcdef")
 #' @seealso \code{\link{then}}
 alt <- function(p1, p2) {
-  return(function(string){
-    result <- p1 (string)
-    if(!is.null(result$leftover)) {return(result)}
-    else{
-      return(p2 (string))
+  function(string){
+    result <- p1(string)
+    if(!is.null(result$leftover)) {
+      result
+    } else {
+      p2(string)
     }
-  })
+  }
 }
 
 #' @export
@@ -109,22 +120,22 @@ alt <- function(p1, p2) {
 #' (item() %then% succeed("123")) ("abc")
 #' @seealso \code{\link{alt}}
 then <- function(p1, p2) {
-  return(function(string) {
-    result <- p1 (string)
+  function(string) {
+    result <- p1(string)
     if (length(result) == 0) {
-      return (list())
-    }
-    else {
-      result_ <- p2 (result$leftover)
+      list()
+    } else {
+      result_ <- p2(result$leftover)
       if (length(result_$leftover) == 0 ||
           is.null(result_$leftover)) {
-        return(list())
+        list()
+      } else {
+        list(result=Unlist(append(list(result$result),
+                                  list(result_$result))),
+             leftover=result_$leftover)
       }
-      return(list(result=Unlist(append(list(result$result),
-                                       list(result_$result))),
-                  leftover=result_$leftover))
     }
-  })
+  }
 }
 
 #' @export
@@ -148,9 +159,11 @@ then <- function(p1, p2) {
 using <- function(p, f) {
   return(function(string) {
     result <- p (string) 
-    if(length(result) == 0) {return(list())}
-    return(list(result=f(result$result),
-                leftover=result$leftover))
+    if(length(result) == 0) {
+      return(list())
+    }
+    list(result=f(result$result),
+         leftover=result$leftover)
   })
 }
 
@@ -167,9 +180,9 @@ using <- function(p, f) {
 #' maybe(Digit())("abc123")
 #' @seealso \code{\link{many}}, \code{\link{some}}
 maybe <- function(p) {
-  return(function(string) {
+  function(string) {
     (p %alt% succeed(NULL))(string)
-  })
+  }
 }
 
 #' \code{many} matches 0 or more of pattern \code{p}. In BNF notation, 
@@ -191,9 +204,9 @@ maybe <- function(p) {
 #' many(Digit()) ("abc")
 #' @seealso \code{\link{maybe}}, \code{\link{some}}
 many <- function(p) {
-  return(function(string) {
-    ((p %then% many(p)) %alt% succeed(NULL)) (string)
-  })
+  function(string) {
+    ((p %then% many(p)) %alt% succeed(NULL))(string)
+  }
 }
 
 #' \code{some} matches 1 or more of pattern \code{p}. in BNF notation, repetition occurs often enough to merit its own abbreviation. When zero or 
@@ -208,9 +221,9 @@ many <- function(p) {
 #' some(Digit()) ("123abc")
 #' @seealso \code{\link{maybe}}, \code{\link{many}}
 some <- function(p) {
-  return(function(string){
-    (p %then% many(p)) (string)
-  })
+  function(string) {
+    (p %then% many(p))(string)
+  }
 }
 
 ## Define the derived primitives ##
@@ -227,7 +240,9 @@ some <- function(p) {
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Digit <- function(...) {
-  satisfy(function(x) {return(!!length(grep("[0-9]", x)))})
+  satisfy(function(x) {
+    !!length(grep("[0-9]", x))
+  })
 }
 
 #' Lower checks for single lower case character
@@ -241,7 +256,11 @@ Digit <- function(...) {
 #'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}, \code{\link{symbol}}
-Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))})}
+Lower <- function(...) {
+  satisfy(function(x) {
+    !!length(grep("[a-z]", x))
+  })
+}
 
 #' Upper checks for a single upper case character
 #' 
@@ -255,7 +274,9 @@ Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))}
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Upper <- function(...) {
-  satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
+  satisfy(function(x) {
+    !!length(grep("[A-Z]", x))
+  })
 }
 
 #' Alpha checks for single alphabet character
@@ -270,7 +291,9 @@ Upper <- function(...) {
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Alpha <- function(...) {
-  satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
+  satisfy(function(x) {
+    !!length(grep("[A-Za-z]", x))
+  })
 }
 
 #' AlphaNum checks for a single alphanumeric character
@@ -286,7 +309,9 @@ Alpha <- function(...) {
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}, \code{\link{symbol}}
 AlphaNum <- function(...) {
-  satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
+  satisfy(function(x) {
+    !!length(grep("[A-Za-z0-9]", x))
+  })
 }
 
 #' SpaceCheck checks for a single space character
@@ -301,7 +326,9 @@ AlphaNum <- function(...) {
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}, \code{\link{symbol}}
 SpaceCheck <- function(...) {
-  satisfy(function(x) {return(!!length(grep("\\s", x)))})
+  satisfy(function(x) {
+    !!length(grep("\\s", x))
+  })
 }
 
 #' \code{String} is a combinator which allows us to build parsers which
@@ -318,14 +345,15 @@ SpaceCheck <- function(...) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 String <- function(string) {
   if (string=="") {
-    return (succeed(NULL))
-  }
-  else {
-    result_=substr(string, 1, 1)
-    leftover_=substring(string, 2)
-    return((literal(result_) %then% 
-            String(leftover_)) %using% 
-             function(x) {paste(unlist(c(x)), collapse="")})
+    succeed(NULL)
+  } else {
+    result_ <- substr(string, 1, 1)
+    leftover_ <- substring(string, 2)
+    (literal(result_) %then% 
+      String(leftover_)) %using% 
+      function(x) {
+        paste(unlist(c(x)), collapse="")
+      }
   }
 }
 
@@ -357,7 +385,9 @@ ident <- function() {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 nat <- function() {
   some(Digit()) %using%
-    function(x) {paste(unlist(c(x)), collapse="")}
+    function(x) {
+      paste(unlist(c(x)), collapse="")
+    }
 }
 
 #' \code{space} matches zero or more space characters.
@@ -372,7 +402,9 @@ nat <- function() {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 space <- function() {
   many(SpaceCheck()) %using%
-    function(x) {return("")}
+    function(x) {
+      ""
+    }
 }
 
 #' \code{token} is a new primitive that ignores any space before and after
@@ -391,7 +423,9 @@ token <- function(p) {
   space() %then%
     p %then%
     space() %using%
-    function(x) {return(unlist(c(x))[2])}
+    function(x) {
+      unlist(c(x))[2]
+    }
 }
 
 #' \code{identifier} creates an identifier
@@ -431,4 +465,6 @@ natural <- function(...) {
 #'   \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
 #'   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
 #'   \code{\link{natural}}
-symbol <- function(xs) {token(String(xs))}
+symbol <- function(xs) {
+  token(String(xs))
+}
