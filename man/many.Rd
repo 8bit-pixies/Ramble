@@ -25,6 +25,6 @@ many(Digit()) ("123abc")
 many(Digit()) ("abc")
 }
 \seealso{
-\code{\link{some}}
+\code{\link{maybe}}, \code{\link{some}}
 }
 

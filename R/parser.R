@@ -157,6 +157,21 @@ using <- function(p, f) {
 #' @export
 `%using%` <- using
 
+#' \code{maybe} matches 0 or 1 of pattern \code{p}.  In EBNF notation, this
+#' corresponds to a question mark ('?').
+#' 
+#' @param p is the parser to be matched 0 or 1 times.
+#' @export
+#' @examples
+#' maybe(Digit())("123abc")
+#' maybe(Digit())("abc123")
+#' @seealso \code{\link{many}}, \code{\link{some}}
+maybe <- function(p) {
+  return(function(string) {
+    (p %alt% succeed(NULL))(string)
+  })
+}
+
 #' \code{many} matches 0 or more of pattern \code{p}. In BNF notation, 
 #' repetition occurs often enough to merit its own abbreviation. When zero or 
 #' more repetitions of a phrase \code{p} are admissible, we simply write 
@@ -174,7 +189,7 @@ using <- function(p, f) {
 #' Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 #' many(Digit()) ("123abc")
 #' many(Digit()) ("abc")
-#' @seealso \code{\link{some}}
+#' @seealso \code{\link{maybe}}, \code{\link{some}}
 many <- function(p) {
   return(function(string) {
     ((p %then% many(p)) %alt% succeed(NULL)) (string)
@@ -191,7 +206,7 @@ many <- function(p) {
 #' @examples
 #' Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 #' some(Digit()) ("123abc")
-#' @seealso \code{\link{many}}
+#' @seealso \code{\link{maybe}}, \code{\link{many}}
 some <- function(p) {
   return(function(string){
     (p %then% many(p)) (string)

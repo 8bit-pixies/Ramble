@@ -23,6 +23,6 @@ Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))}
 some(Digit()) ("123abc")
 }
 \seealso{
-\code{\link{many}}
+\code{\link{maybe}}, \code{\link{many}}
 }
 
