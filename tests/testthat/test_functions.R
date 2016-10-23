@@ -11,9 +11,38 @@ test_that("item", {
 })
 
 test_that("then", {
-  expect_equal((item() %then% succeed("123") ) ("abc")$result[[1]], "a")
-  expect_equal((item() %then% succeed("123") ) ("abc")$result[[2]], "123")
-  expect_equal((item() %then% succeed("123") ) ("abc")$leftover, "bc")
+  expect_equal((item() %then% succeed("123") ) ("abc"),
+               list(result=list("a", "123"),
+                    leftover="bc"))
+  ## Differentiate "then" from "thentree"
+  newparam <- function(x) {
+    function(string) {
+      ret <- succeed(x)(string)
+      ret$result <- list(value=ret$result,
+                         more=TRUE)
+      ret
+    }
+  }
+  expect_equal((item() %then% newparam("123") ) ("abc"),
+               list(result=list("a", "123", TRUE),
+                    leftover="bc"))
+})
+
+test_that("thentree", {
+  expect_equal((item() %thentree% succeed("123") ) ("abc"),
+               list(result=list("a", "123"),
+                    leftover="bc"))
+  newparam <- function(x) {
+    function(string) {
+      ret <- succeed(x)(string)
+      ret$result <- list(value=ret$result,
+                         more=TRUE)
+      ret
+    }
+  }
+  expect_equal((item() %thentree% newparam("123") ) ("abc"),
+               list(result=list("a", list(value="123", more=TRUE)),
+                    leftover="bc"))
 })
 
 test_that("alternation", {

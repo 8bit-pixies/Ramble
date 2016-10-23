@@ -118,7 +118,7 @@ alt <- function(p1, p2) {
 #'   succession.
 #' @examples
 #' (item() %then% succeed("123")) ("abc")
-#' @seealso \code{\link{alt}}
+#' @seealso \code{\link{alt}}, \code{\link{thentree}}
 then <- function(p1, p2) {
   function(string) {
     result <- p1(string)
@@ -140,6 +140,41 @@ then <- function(p1, p2) {
 
 #' @export
 `%then%` <- then
+
+#' \code{thentree} keeps the full tree representation of the results of parsing.
+#' Otherwise, it is identical to \code{then}.
+#' 
+#' \code{\%thentree\%} is the infix operator for the then combinator, and it is
+#' the preferred way to use the \code{thentree} operator.
+#' 
+#' @param p1 the first parser
+#' @param p2 the second parser
+#' @return recognises anything that \code{p1} and \code{p2} would if placed in 
+#'   succession.
+#' @examples
+#' (item() %thentree% succeed("123")) ("abc")
+#' @seealso \code{\link{alt}}, \code{\link{thentree}}
+thentree <- function(p1, p2) {
+  function(string) {
+    result <- p1(string)
+    if (length(result) == 0) {
+      list()
+    } else {
+      result_ <- p2(result$leftover)
+      if (length(result_$leftover) == 0 ||
+          is.null(result_$leftover)) {
+        list()
+      } else {
+        list(result=list(result$result,
+                         result_$result),
+             leftover=result_$leftover)
+      }
+    }
+  }
+}
+
+#' @export
+`%thentree%` <- thentree
 
 #' \code{using} combinator allows us to manipulate results from a parser, for 
 #' example building a parse tree. The parser \code{(p \%using\% f)} has the same 

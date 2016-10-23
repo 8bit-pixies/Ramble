@@ -2,6 +2,7 @@
 
 export("%alt%")
 export("%then%")
+export("%thentree%")
 export("%using%")
 export(Alpha)
 export(AlphaNum)

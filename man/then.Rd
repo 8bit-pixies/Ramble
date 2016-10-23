@@ -25,6 +25,6 @@ preferred way to use the \code{then} operator.
 (item() \%then\% succeed("123")) ("abc")
 }
 \seealso{
-\code{\link{alt}}
+\code{\link{alt}}, \code{\link{thentree}}
 }
 
