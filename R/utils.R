@@ -3,17 +3,15 @@
 #' 
 #' @param a.list is a list to be flatten
 #' @importFrom methods is
-Unlist <- function(a.list) { #nocov start
-  hasLowerLevel <- TRUE
-  while (hasLowerLevel) {
-    a.list1 <- unlist(a.list, recursive=FALSE, use.names=FALSE)
-    if (is(a.list1, 'list')) {
-      a.list <- a.list1
+Unlist <- function(obj) {
+  ret <- list()
+  for (i in seq_along(obj)) {
+    if (is(obj[[i]], "list")) {
+      ret <- append(ret, Unlist(obj[[i]]))
     } else {
-      hasLowerLevel <- FALSE
-      return(a.list)
+      ret <- append(ret, obj[i])
     }
   }
-  warning("loop should have returned a list!")
-  return(a.list)
-} #nocov end
+  ret
+}
+

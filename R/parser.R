@@ -8,10 +8,10 @@
 #' @examples 
 #' succeed("1") ("abc")
 succeed <- function(string) {
-  return(function(nextString) {
+  function(nextString) {
     list(result=string,
          leftover=nextString)
-  })
+  }
 }
 
 #' \code{item} is a parser that consumes the first character of the string and
@@ -459,7 +459,9 @@ token <- function(p) {
     p %then%
     space() %using%
     function(x) {
-      unlist(c(x))[2]
+      x <- x[-1]
+      x <- x[-length(x)]
+      x
     }
 }
 

@@ -20,11 +20,15 @@ test_that("then", {
       ret <- succeed(x)(string)
       ret$result <- list(value=ret$result,
                          more=TRUE)
+      class(ret$result) <- "newparam"
       ret
     }
   }
-  expect_equal((item() %then% newparam("123") ) ("abc"),
-               list(result=list("a", "123", TRUE),
+  expect_equal((item() %then% newparam("123"))("abc"),
+               list(result=list("a",
+                                structure(list(value="123", more=TRUE),
+                                          .Names=c("value", "more"),
+                                          class="newparam")),
                     leftover="bc"))
 })
 
@@ -41,7 +45,8 @@ test_that("thentree", {
     }
   }
   expect_equal((item() %thentree% newparam("123") ) ("abc"),
-               list(result=list("a", list(value="123", more=TRUE)),
+               list(result=list("a",
+                                list(value="123", more=TRUE)),
                     leftover="bc"))
 })
 
@@ -60,7 +65,31 @@ test_that("identifier", {
   expect_equal(identifier()("  variable1  ")$leftover, "")
 })
 
-
-
-
-
+test_that("token", {
+  expect_equal(token(Digit())("123"),
+               list(result="1",
+                    leftover="23"))
+  expect_equal(token(Digit())(" 123"),
+               list(result="1",
+                    leftover="23"))
+  expect_equal(token(Digit())(" 1 23"),
+               list(result="1",
+                    leftover="23"))
+  expect_equal(token(Digit())(" 1   23"),
+               list(result="1",
+                    leftover="23"))
+  expect_equal(token(Digit())(" a 23"),
+               list())
+  ## Keep attributes now
+  newparam <- function(x) {
+    function(string) {
+      ret <- succeed(x)(string)
+      ret$result <- list(value=ret$result,
+                         more=TRUE)
+      ret
+    }
+  }
+  expect_equal(token(String("abc") %thentree% newparam("123"))(" abc "),
+               list(result=list("abc", list(value="123", more=TRUE)),
+                    leftover=""))
+})
