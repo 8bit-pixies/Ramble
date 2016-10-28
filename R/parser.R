@@ -102,7 +102,14 @@ alt <- function(p1, p2) {
   }
 }
 
+#' \code{\%alt\%} is the infix notation for the \code{alt} function. 
+#' 
+#' @param p1 the first parser
+#' @param p2 the second parser 
+#' @return Returns the first parser if it suceeds otherwise the second parser
 #' @export
+#' @examples
+#' (item() %alt% succeed("2")) ("abcdef")
 `%alt%` <- alt
 
 #' \code{then} combinator corresponds to sequencing in BNF. The parser 
@@ -138,21 +145,27 @@ then <- function(p1, p2) {
   }
 }
 
+#' \code{\%then\%} is the infix operator for the then combinator.
+#' 
+#' @param p1 the first parser
+#' @param p2 the second parser 
+#' @return recognises anything that \code{p1} and \code{p2} would if placed in succession.
 #' @export
+#' @examples
+#' (item() %then% succeed("123")) ("abc")
 `%then%` <- then
 
 #' \code{thentree} keeps the full tree representation of the results of parsing.
 #' Otherwise, it is identical to \code{then}.
 #' 
-#' \code{\%thentree\%} is the infix operator for the then combinator, and it is
-#' the preferred way to use the \code{thentree} operator.
-#' 
 #' @param p1 the first parser
 #' @param p2 the second parser
 #' @return recognises anything that \code{p1} and \code{p2} would if placed in 
 #'   succession.
+#' @export
 #' @examples
 #' (item() %thentree% succeed("123")) ("abc")
+#' 
 #' @seealso \code{\link{alt}}, \code{\link{thentree}}
 thentree <- function(p1, p2) {
   function(string) {
@@ -173,7 +186,16 @@ thentree <- function(p1, p2) {
   }
 }
 
+#' \code{\%thentree\%} is the infix operator for the then combinator, and it is
+#' the preferred way to use the \code{thentree} operator.
 #' @export
+#' @param p1 the first parser
+#' @param p2 the second parser
+#' @return recognises anything that \code{p1} and \code{p2} would if placed in 
+#'   succession.
+#' @examples
+#' (item() %thentree% succeed("123")) ("abc")
+#' @seealso \code{\link{alt}}, \code{\link{thentree}}
 `%thentree%` <- thentree
 
 #' \code{using} combinator allows us to manipulate results from a parser, for 
@@ -202,7 +224,13 @@ using <- function(p, f) {
   })
 }
 
+#' \code{\%using\%} is the infix operator for using
+#' 
+#' @param p is the parser to be applied
+#' @param f is the function to be applied to each result of \code{p}.
 #' @export
+#' @examples
+#' (item() %using% as.numeric) ("1abc")
 `%using%` <- using
 
 #' \code{maybe} matches 0 or 1 of pattern \code{p}.  In EBNF notation, this

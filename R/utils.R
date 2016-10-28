@@ -1,7 +1,7 @@
 #' Unlist is the same as unlist, but doesn't recurse all the way to
 #' preserve the type. This function is not well optimised.
 #' 
-#' @param a.list is a list to be flatten
+#' @param obj is a list to be flatten
 #' @importFrom methods is
 Unlist <- function(obj) {
   ret <- list()

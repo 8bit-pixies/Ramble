@@ -8,7 +8,7 @@ preserve the type. This function is not well optimised.}
 Unlist(obj)
 }
 \arguments{
-\item{a.list}{is a list to be flatten}
+\item{obj}{is a list to be flatten}
 }
 \description{
 Unlist is the same as unlist, but doesn't recurse all the way to
