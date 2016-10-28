@@ -6,7 +6,8 @@
 Unlist <- function(obj) {
   ret <- list()
   for (i in seq_along(obj)) {
-    if (is(obj[[i]], "list")) {
+    if (is(obj[[i]], "list") &&
+        is.null(names(obj[[i]]))) {
       ret <- append(ret, Unlist(obj[[i]]))
     } else {
       ret <- append(ret, obj[i])

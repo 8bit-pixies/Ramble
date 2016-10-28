@@ -5,7 +5,7 @@
 \title{Unlist is the same as unlist, but doesn't recurse all the way to
 preserve the type. This function is not well optimised.}
 \usage{
-Unlist(a.list)
+Unlist(obj)
 }
 \arguments{
 \item{a.list}{is a list to be flatten}
