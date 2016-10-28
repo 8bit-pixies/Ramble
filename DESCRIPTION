@@ -1,7 +1,7 @@
 Package: Ramble
 Type: Package
 Title: Parser Combinator for R
-Version: 0.1.0.9000
+Version: 0.1.1
 Date: 2016-10-23
 Author: Chapman Siu
 Maintainer: Chapman Siu <chpmn.siu@gmail.com>
