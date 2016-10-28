@@ -2,7 +2,7 @@
 % Please edit documentation in R/parser.R
 \name{String}
 \alias{String}
-\title{\code{string} is a combinator which allows us to build parsers which
+\title{\code{String} is a combinator which allows us to build parsers which
 recognise strings of symbols, rather than just single symbols}
 \usage{
 String(string)
@@ -11,10 +11,17 @@ String(string)
 \item{string}{is the string to be matched}
 }
 \description{
-\code{string} is a combinator which allows us to build parsers which
+\code{String} is a combinator which allows us to build parsers which
 recognise strings of symbols, rather than just single symbols
 }
 \examples{
 String("123")("123 abc")
+}
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+  \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+  \code{\link{ident}}, \code{\link{nat}}, 
+  \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+  \code{\link{natural}}, \code{\link{symbol}}
 }
 

@@ -10,7 +10,7 @@ and is defined in much the same way.}
 some(p)
 }
 \arguments{
-\item{p}{is the parser to matched 1 or more times.}
+\item{p}{is the parser to match 1 or more times.}
 }
 \description{
 \code{some} matches 1 or more of pattern \code{p}. in BNF notation, repetition occurs often enough to merit its own abbreviation. When zero or 
@@ -21,5 +21,8 @@ and is defined in much the same way.
 \examples{
 Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
 some(Digit()) ("123abc")
+}
+\seealso{
+\code{\link{maybe}}, \code{\link{many}}
 }
 

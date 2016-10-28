@@ -15,4 +15,11 @@ Alpha checks for single alphabet character
 \examples{
 Alpha()("abc")
 }
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+  \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+  \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+  \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+  \code{\link{natural}}, \code{\link{symbol}}
+}
 

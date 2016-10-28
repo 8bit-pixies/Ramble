@@ -12,4 +12,11 @@ identifier(...)
 \description{
 \code{identifier} creates an identifier
 }
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+  \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+  \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+  \code{\link{space}}, \code{\link{token}},
+  \code{\link{natural}}, \code{\link{symbol}}
+}
 

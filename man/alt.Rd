@@ -19,10 +19,13 @@ alt(p1, p2)
 Returns the first parser if it suceeds otherwise the second parser
 }
 \description{
-\code{alt} combinator is similar to alternation in BNF. the parser 
-\code{(alt(p1, p2))} recognises anything that \code{p1} or \code{p2} would. 
-The approach taken in this parser follows (Fairbairn86), in which either is 
-interpretted in a sequential (or exclusive) manner, returning the result of
-the first parser to succeed, and failure if neither does.
+\code{\%alt\%} is the infix notation for the \code{alt} function, and it is the
+preferred way to use the \code{alt} operator.
+}
+\examples{
+(item() \%alt\% succeed("2")) ("abcdef")
+}
+\seealso{
+\code{\link{then}}
 }
 

@@ -12,4 +12,11 @@ nat()
 \examples{
 nat() ("123 + 456")
 }
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+  \code{\link{Alpha}}, \code{\link{AlphaNum}}, \code{\link{SpaceCheck}}, 
+  \code{\link{String}}, \code{\link{ident}},
+  \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+  \code{\link{natural}}, \code{\link{symbol}}
+}
 

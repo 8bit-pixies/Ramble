@@ -14,11 +14,17 @@ then(p1, p2)
 \item{p2}{the second parser}
 }
 \value{
-recognises anything that \code{p1} and \code{p2} would if placed in succession.
+recognises anything that \code{p1} and \code{p2} would if placed in 
+  succession.
 }
 \description{
-\code{then} combinator corresponds to sequencing in BNF. The parser 
-\code{(then(p1, p2))} recognises anything that \code{p1} and \code{p2} would 
-if placed in succession.
+\code{\%then\%} is the infix operator for the then combinator, and it is the
+preferred way to use the \code{then} operator.
+}
+\examples{
+(item() \%then\% succeed("123")) ("abc")
+}
+\seealso{
+\code{\link{alt}}, \code{\link{thentree}}
 }
 

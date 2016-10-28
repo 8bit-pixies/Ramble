@@ -16,4 +16,11 @@ AlphaNum checks for a single alphanumeric character
 AlphaNum()("123")
 AlphaNum()("abc123")
 }
+\seealso{
+\code{\link{Digit}}, \code{\link{Lower}}, \code{\link{Upper}}, 
+  \code{\link{Alpha}}, \code{\link{SpaceCheck}}, 
+  \code{\link{String}}, \code{\link{ident}}, \code{\link{nat}}, 
+  \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
+  \code{\link{natural}}, \code{\link{symbol}}
+}
 
