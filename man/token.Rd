@@ -24,4 +24,3 @@ token(ident()) ("   variable1   ")
   \code{\link{space}}, \code{\link{identifier}},
   \code{\link{natural}}, \code{\link{symbol}}
 }
-

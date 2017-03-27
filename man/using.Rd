@@ -26,4 +26,3 @@ preferred way to use the \code{using} operator.
 \examples{
 (item() \%using\% as.numeric) ("1abc")
 }
-

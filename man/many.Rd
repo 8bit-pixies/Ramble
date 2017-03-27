@@ -27,4 +27,3 @@ many(Digit()) ("abc")
 \seealso{
 \code{\link{maybe}}, \code{\link{some}}
 }
-

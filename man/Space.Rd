@@ -19,4 +19,3 @@ space() ("  abc")
   \code{\link{token}}, \code{\link{identifier}},
   \code{\link{natural}}, \code{\link{symbol}}
 }
-

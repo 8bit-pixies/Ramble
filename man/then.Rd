@@ -27,4 +27,3 @@ preferred way to use the \code{then} operator.
 \seealso{
 \code{\link{alt}}, \code{\link{thentree}}
 }
-

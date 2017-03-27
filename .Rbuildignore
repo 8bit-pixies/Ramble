@@ -4,3 +4,6 @@ example.*?.R
 readme.md
 ^\.travis\.yml$
 cran-comments.md
+docs/*
+joss-paper/*
+example/*

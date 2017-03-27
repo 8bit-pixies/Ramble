@@ -3,12 +3,11 @@
 \docType{package}
 \name{Ramble}
 \alias{Ramble}
-\alias{Ramble-package}
-\alias{package-ramble}
 \alias{ramble}
+\alias{package-ramble}
+\alias{Ramble-package}
 \title{Ramble is a parser generator using combinatory parsers.}
 \description{
 Ramble allows you to write parsers in a functional manner, inspired by 
 Haskell's Parsec library.
 }
-

@@ -17,4 +17,3 @@ p \%using\% f
 \examples{
 (item() \%using\% as.numeric) ("1abc")
 }
-

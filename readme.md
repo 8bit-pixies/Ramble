@@ -33,13 +33,28 @@ Python's [recursive descent parsing library](https://pypi.python.org/pypi/funcpa
 
 *  [Higher-order functions for parsing](http://eprints.nottingham.ac.uk/221/1/parsing.pdf)
 
+Contributing
+============
+
+You can contribute by opening issues on Github or implementing things yourself and making a pull request. 
+
+Please ensure that package passes all checks with `--as-cran` flag (i.e. via `devtools::check(args = c('--as-cran'))`) before submitting a pull request. 
+
 How it Works
 ============
 
-To understand the differences between Ramble and other combinatory parsers please read [Ramble: A Parser Combinator in R](http://www.slideshare.net/chapm0nsiu/ramble-introduction).
+To understand the differences between Ramble and other combinatory parsers please read [Ramble: A Parser Combinator in R](https://github.com/chappers/Ramble/blob/master/docs/ramble-introduction.pdf).
 
 Example
 =======
+
+You may view examples for:
+
+*  Parsing xml file
+*  Creating a simple calculator
+*  Reading a number given in words, and converting it to the appropriate numeric value
+
+Within the `examples/*` folder. Below is the calculator example.
 
 ```r
 #' expr :: = term + term | term - term | term
