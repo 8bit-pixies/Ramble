@@ -1,5 +1,5 @@
 ---
-title: "Eclipse Golo"
+title: "Ramble: Parser Combinator for R"
 tags:
   - R
   - Parser combinator
