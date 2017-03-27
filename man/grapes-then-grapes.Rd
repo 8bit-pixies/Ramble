@@ -20,4 +20,3 @@ recognises anything that \code{p1} and \code{p2} would if placed in succession.
 \examples{
 (item() \%then\% succeed("123")) ("abc")
 }
-

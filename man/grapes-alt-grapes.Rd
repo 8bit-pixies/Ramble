@@ -20,4 +20,3 @@ Returns the first parser if it suceeds otherwise the second parser
 \examples{
 (item() \%alt\% succeed("2")) ("abcdef")
 }
-

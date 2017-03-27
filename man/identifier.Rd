@@ -19,4 +19,3 @@ identifier(...)
   \code{\link{space}}, \code{\link{token}},
   \code{\link{natural}}, \code{\link{symbol}}
 }
-

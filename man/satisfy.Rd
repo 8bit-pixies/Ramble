@@ -12,4 +12,3 @@ satisfy(p)
 \description{
 \code{satisfy} is a function which allows us to make parsers that recognise single symbols.
 }
-

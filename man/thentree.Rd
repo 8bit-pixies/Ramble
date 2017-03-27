@@ -27,4 +27,3 @@ Otherwise, it is identical to \code{then}.
 \seealso{
 \code{\link{alt}}, \code{\link{thentree}}
 }
-

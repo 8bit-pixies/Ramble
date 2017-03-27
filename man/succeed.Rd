@@ -21,4 +21,3 @@ value must be pre-detemined, so it is included as an extra parameter.
 \examples{
 succeed("1") ("abc")
 }
-

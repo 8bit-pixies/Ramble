@@ -20,4 +20,3 @@ will emit the empty list, indicating the parser has failed.
 item() ("abc")
 item() ("")
 }
-

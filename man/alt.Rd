@@ -28,4 +28,3 @@ preferred way to use the \code{alt} operator.
 \seealso{
 \code{\link{then}}
 }
-

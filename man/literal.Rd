@@ -17,4 +17,3 @@ single symbol with the first character in the string.
 \examples{
 literal("a") ("abc")
 }
-

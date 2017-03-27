@@ -22,4 +22,3 @@ symbol("[") ("  [123]")
   \code{\link{space}}, \code{\link{token}}, \code{\link{identifier}},
   \code{\link{natural}}
 }
-
