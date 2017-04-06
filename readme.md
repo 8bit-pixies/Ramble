@@ -1,6 +1,7 @@
 Ramble
 ======
 
+[![status](http://joss.theoj.org/papers/1b33a8141e698aa4cf038b3c5c9bbfd8/status.svg)](http://joss.theoj.org/papers/1b33a8141e698aa4cf038b3c5c9bbfd8)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/Ramble)](http://cran.r-project.org/package=Ramble)
 [![Travis-CI Build Status](https://travis-ci.org/chappers/Ramble.svg?branch=master)](https://travis-ci.org/chappers/Ramble)
 [![Coverage Status](http://codecov.io/github/chappers/Ramble/coverage.svg?branch=master)](http://codecov.io/github/chappers/Ramble?branch=master)
