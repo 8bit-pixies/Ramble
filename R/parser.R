@@ -262,7 +262,7 @@ maybe <- function(p) {
 #' @param p is the parser to match 0 or more times.
 #' @export
 #' @examples
-#' Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
+#' Digit <- function(...) {satisfy(function(x) {return(grepl("[0-9]", x))})}
 #' many(Digit()) ("123abc")
 #' many(Digit()) ("abc")
 #' @seealso \code{\link{maybe}}, \code{\link{some}}
@@ -280,7 +280,7 @@ many <- function(p) {
 #' @param p is the parser to match 1 or more times.
 #' @export
 #' @examples
-#' Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
+#' Digit <- function(...) {satisfy(function(x) {return(grepl("[0-9]", x))})}
 #' some(Digit()) ("123abc")
 #' @seealso \code{\link{maybe}}, \code{\link{many}}
 some <- function(p) {
@@ -304,7 +304,7 @@ some <- function(p) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Digit <- function(...) {
   satisfy(function(x) {
-    !!length(grep("[0-9]", x))
+    grepl("[0-9]", x)
   })
 }
 
@@ -321,7 +321,7 @@ Digit <- function(...) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Lower <- function(...) {
   satisfy(function(x) {
-    !!length(grep("[a-z]", x))
+    grepl("[a-z]", x)
   })
 }
 
@@ -338,7 +338,7 @@ Lower <- function(...) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Upper <- function(...) {
   satisfy(function(x) {
-    !!length(grep("[A-Z]", x))
+    grepl("[A-Z]", x)
   })
 }
 
@@ -355,7 +355,7 @@ Upper <- function(...) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 Alpha <- function(...) {
   satisfy(function(x) {
-    !!length(grep("[A-Za-z]", x))
+    grepl("[A-Za-z]", x)
   })
 }
 
@@ -373,7 +373,7 @@ Alpha <- function(...) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 AlphaNum <- function(...) {
   satisfy(function(x) {
-    !!length(grep("[A-Za-z0-9]", x))
+    grepl("[A-Za-z0-9]", x)
   })
 }
 
@@ -390,7 +390,7 @@ AlphaNum <- function(...) {
 #'   \code{\link{natural}}, \code{\link{symbol}}
 SpaceCheck <- function(...) {
   satisfy(function(x) {
-    !!length(grep("\\s", x))
+    grepl("\\s", x)
   })
 }
 

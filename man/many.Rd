@@ -20,7 +20,7 @@ tuples, we must revert to using a list rather than a vector, since all values
 in an R vector must be the same datatype.
 }
 \examples{
-Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
+Digit <- function(...) {satisfy(function(x) {return(grepl("[0-9]", x))})}
 many(Digit()) ("123abc")
 many(Digit()) ("abc")
 }
