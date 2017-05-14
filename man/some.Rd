@@ -19,7 +19,7 @@ more repetitions of a phrase \code{p} are admissible, we simply write
 and is defined in much the same way.
 }
 \examples{
-Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
+Digit <- function(...) {satisfy(function(x) {return(grepl("[0-9]", x))})}
 some(Digit()) ("123abc")
 }
 \seealso{

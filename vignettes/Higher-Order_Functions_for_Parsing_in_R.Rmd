@@ -202,12 +202,12 @@ Using the basic parsers together with sequencing and choice, we can now define a
 Firstly using `satisfy` with the appropriate predicates, we can define parsers for single digits, lower-case letters, upper-case letters, arbitrary letters, alphanumeric characters, and specific characters. We have already demonstrated how we can parser specific characters (see `literal`), but the others can be defined in a similar way:
 
 ```{r, derived}
-Digit <- function(...) {satisfy(function(x) {return(!!length(grep("[0-9]", x)))})}
-Lower <- function(...) {satisfy(function(x) {return(!!length(grep("[a-z]", x)))})}
-Upper <- function(...) satisfy(function(x) {return(!!length(grep("[A-Z]", x)))})
-Alpha <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z]", x)))})
-AlphaNum <- function(...) satisfy(function(x) {return(!!length(grep("[A-Za-z0-9]", x)))})
-SpaceCheck <- function(...) satisfy(function(x) {return(!!length(grep("\\s", x)))})
+Digit <- function(...) {satisfy(function(x) {return(grepl("[0-9]", x))})}
+Lower <- function(...) {satisfy(function(x) {return(grepl("[a-z]", x))})}
+Upper <- function(...) satisfy(function(x) {return(grepl("[A-Z]", x))})
+Alpha <- function(...) satisfy(function(x) {return(grepl("[A-Za-z]", x))})
+AlphaNum <- function(...) satisfy(function(x) {return(grepl("[A-Za-z0-9]", x))})
+SpaceCheck <- function(...) satisfy(function(x) {return(grepl("\\s", x))})
 ```
 
 In a similar many we can define a parser `String` for the string of characters, with the string itself returned as the result value:
